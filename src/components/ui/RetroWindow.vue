@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 withDefaults(defineProps<{
   title?: string
   closeLabel?: string
@@ -12,7 +14,9 @@ withDefaults(defineProps<{
   <div class="retro-window">
     <div class="retro-window__bar">
       <span>{{ title }}</span>
-      <span class="retro-window__close" role="img" :aria-label="closeLabel">×</span>
+      <span class="retro-window__close" role="img" :aria-label="closeLabel">
+        <Icon class="retro-window__close-icon" icon="material-symbols:close" />
+      </span>
     </div>
     <div class="retro-window__content">
       <slot />
@@ -52,6 +56,10 @@ withDefaults(defineProps<{
   font-size: 1rem;
   font-weight: 700;
 
+  &:hover {
+    cursor: pointer;
+  }
+
   &:active {
     box-shadow: inset 1px 1px #444, inset -1px -1px white;
     border-top-color: #404040;
@@ -59,6 +67,11 @@ withDefaults(defineProps<{
     border-right-color: #fff;
     border-bottom-color: #fff;
   }
+}
+
+.retro-window__close-icon {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .retro-window__content {
