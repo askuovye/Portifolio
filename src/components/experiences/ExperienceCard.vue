@@ -10,7 +10,7 @@ defineProps<{
 <template>
   <article>
     <p>{{ period }}</p>
-    <h2>{{ role }}</h2>
+    <h4>{{ role }}</h4>
     <p>{{ company }}</p>
     <ul>
       <li v-for="activity in activities" :key="activity">{{ activity }}</li>

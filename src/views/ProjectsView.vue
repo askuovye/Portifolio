@@ -6,8 +6,8 @@ import ProjectsList from '@/components/projects/ProjectsList.vue'
 
 <template>
   <ProjectsHero />
-  <main>
+  <div class="projects-content">
     <ProjectFilters />
     <ProjectsList />
-  </main>
+  </div>
 </template>

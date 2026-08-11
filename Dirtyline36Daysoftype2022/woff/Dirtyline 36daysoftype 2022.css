@@ -1,0 +1,12 @@
+/* Webfont: Dirtyline36Daysoftype2022-Reg */@font-face {
+    font-family: 'Dirtyline36Daysoftype2022';
+    src: url('Dirtyline 36daysoftype 2022.eot'); /* IE9 Compat Modes */
+    src: url('Dirtyline 36daysoftype 2022.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+         url('Dirtyline 36daysoftype 2022.woff') format('woff'), /* Modern Browsers */
+         url('Dirtyline 36daysoftype 2022.woff2') format('woff2'), /* Modern Browsers */
+         url('Dirtyline 36daysoftype 2022.ttf') format('truetype'); /* Safari, Android, iOS */
+             font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

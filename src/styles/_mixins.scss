@@ -1,0 +1,18 @@
+@mixin breakpoint-down($width) {
+  @media (max-width: $width) {
+    @content;
+  }
+}
+
+@mixin technical-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@mixin hard-panel {
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--surface);
+}

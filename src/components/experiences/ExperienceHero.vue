@@ -1,6 +1,6 @@
 <template>
   <section>
-    <h1>Minha Trajetória Profissional</h1>
+    <h2>Minha Trajetória Profissional</h2>
     <p>Minha jornada pela área da tecnologia e afins.</p>
   </section>
 </template>

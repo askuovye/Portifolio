@@ -7,22 +7,22 @@ export const routes: RouteRecordRaw[] = [
     component: () => import('../views/HomeView.vue'),
   },
   {
-    path: '/sobre',
+    path: '/about',
     name: 'about',
     component: () => import('../views/AboutView.vue'),
   },
   {
-    path: '/projetos',
+    path: '/projects',
     name: 'projects',
     component: () => import('../views/ProjectsView.vue'),
   },
   {
-    path: '/experiencias',
+    path: '/experiences',
     name: 'experiences',
     component: () => import('../views/ExperiencesView.vue'),
   },
   {
-    path: '/contato',
+    path: '/contact',
     name: 'contact',
     component: () => import('../views/ContactView.vue'),
   },
@@ -35,7 +35,7 @@ export const routes: RouteRecordRaw[] = [
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-  scrollBehavior: () => ({ top: 0 }),
+  scrollBehavior: (_to, _from, savedPosition) => savedPosition ?? { top: 0 },
 })
 
 export default router
