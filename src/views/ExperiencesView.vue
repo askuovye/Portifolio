@@ -1,26 +1,15 @@
-<script setup>
-
+<script setup lang="ts">
+import CertificationsSection from '@/components/experiences/CertificationsSection.vue'
+import EducationSection from '@/components/experiences/EducationSection.vue'
+import ExperienceHero from '@/components/experiences/ExperienceHero.vue'
+import ExperienceTimeline from '@/components/experiences/ExperienceTimeline.vue'
 </script>
 
 <template>
-    <section>
-        <h3>Minha Trajetória Profissional</h3>
-        <p>Minha jornada pela área da tecnologia e afins.</p>
-    </section>
-    <main>
-        <section>
-            <p>Jul. 2026 – Presente</p>
-            <h4>Estagio Assistente Tecnico Ti</h4>
-            <p>BP Tech</p>
-            <p>• Suporte técnico a usuários internos, resolução de problemas de hardware e software, manutenção de sistemas e
-                redes.<br>
-                • Instalação, configuração e atualização de equipamentos, softwares e periféricos.<br>
-                • Implementação de WhatsApp chatbot, desenvolvido em Laravel.
-            </p>
-        </section>
-    </main>
+  <ExperienceHero />
+  <main>
+    <ExperienceTimeline />
+    <EducationSection />
+    <CertificationsSection />
+  </main>
 </template>
-
-<style scoped>
-
-</style>
