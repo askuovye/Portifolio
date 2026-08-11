@@ -7,11 +7,11 @@ import WorkSummary from '@/components/about/WorkSummary.vue'
 </script>
 
 <template>
-  <main>
+  <div class="about-content">
     <AboutIntro />
     <TechnicalIdentity />
     <WorkSummary />
     <PersonalBackground />
     <ContactLinks />
-  </main>
+  </div>
 </template>

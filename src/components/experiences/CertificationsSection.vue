@@ -8,7 +8,7 @@ const certifications = [
 
 <template>
   <section>
-    <h2>Certificações</h2>
+    <h3>Certificações</h3>
     <p v-for="certification in certifications" :key="certification">{{ certification }}</p>
   </section>
 </template>

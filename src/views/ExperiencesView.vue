@@ -7,9 +7,9 @@ import ExperienceTimeline from '@/components/experiences/ExperienceTimeline.vue'
 
 <template>
   <ExperienceHero />
-  <main>
+  <div class="experiences-content">
     <ExperienceTimeline />
     <EducationSection />
     <CertificationsSection />
-  </main>
+  </div>
 </template>

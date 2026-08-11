@@ -4,7 +4,7 @@ const links = ['LinkedIn', 'GitHub', 'Email', 'WhatsApp', 'Currículo']
 
 <template>
   <section>
-    <h2>Onde me achar?</h2>
+    <h3>Onde me achar?</h3>
     <p v-for="link in links" :key="link">{{ link }}</p>
   </section>
 </template>

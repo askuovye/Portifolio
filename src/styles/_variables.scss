@@ -1,0 +1,19 @@
+$container-max: 93.75rem;
+$breakpoint-tablet: 56rem;
+$breakpoint-mobile: 38rem;
+$z-header: 100;
+
+:root {
+  --background: #030303;
+  --surface: #080808;
+  --surface-secondary: #0d0d0d;
+  --text-primary: #f2f2f2;
+  --text-secondary: #aaa;
+  --border: #4b4b4b;
+  --accent: #173cff;
+  --accent-bright: #3157ff;
+  --font-display: 'Dirtyline', Impact, sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+  --site-gutter: clamp(1rem, 3vw, 2.5rem);
+  --section-space: clamp(3.5rem, 8vw, 8rem);
+}

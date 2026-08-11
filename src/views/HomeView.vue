@@ -8,10 +8,10 @@ import StackSection from '@/components/home/StackSection.vue'
 
 <template>
   <HeroSection />
-  <main>
+  <div class="home-content">
     <StackSection />
     <ProjectsSection />
     <ExperiencesSection />
     <ContactSection />
-  </main>
+  </div>
 </template>

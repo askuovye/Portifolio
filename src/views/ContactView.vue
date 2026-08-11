@@ -5,9 +5,9 @@ import ContactInfo from '@/components/contact/ContactInfo.vue'
 </script>
 
 <template>
-  <main>
+  <div class="contact-content">
     <ContactHero />
     <AvailabilitySection />
     <ContactInfo />
-  </main>
+  </div>
 </template>

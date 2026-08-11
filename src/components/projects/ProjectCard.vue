@@ -9,7 +9,7 @@ defineProps<{
 
 <template>
   <article>
-    <h2>{{ title }}</h2>
+    <h4>{{ title }}</h4>
     <p>{{ technologies.join(', ') }}</p>
     <p>{{ description }}</p>
     <p v-if="status">{{ status }}</p>
