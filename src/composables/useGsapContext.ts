@@ -26,7 +26,12 @@ export function useGsapContext(
     const scopeElement = toValue(scope)
     if (!scopeElement) return
 
-    context = gsap.context(() => {
+    context = gsap.context((scopedContext) => {
+      if (typeof window.matchMedia !== 'function') {
+        setup({ context: scopedContext, reducedMotion: true })
+        return
+      }
+
       media = gsap.matchMedia()
       media.add(
         {
