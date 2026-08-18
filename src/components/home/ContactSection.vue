@@ -13,13 +13,14 @@ interface ContactChannel {
   label: string
   detail: string
   icon: string
+  href: string
 }
 
 const channels: ContactChannel[] = [
-  { label: 'Email', detail: 'Resposta direta', icon: 'mdi:email-outline' },
-  { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin' },
-  { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github' },
-  { label: 'WhatsApp', detail: 'Conversa rápida', icon: 'mdi:whatsapp' },
+  { label: 'Email', detail: 'Resposta direta', icon: 'mdi:email-outline', href: '#' },
+  { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin', href: '#' },
+  { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github', href: '#' },
+  { label: 'WhatsApp', detail: 'Conversa rápida', icon: 'mdi:whatsapp', href: '#' },
 ]
 
 const section = ref<HTMLElement | null>(null)
@@ -93,9 +94,10 @@ useGsapContext(section, ({ reducedMotion }) => {
           </div>
 
           <p class="contact__channels-title">// CANAIS_DISPONÍVEIS</p>
-          <motion.div
+          <motion.a
             v-for="(channel, index) in channels"
             :key="channel.label"
+            :href="channel.href"
             class="contact-channel"
             :while-hover="prefersReducedMotion ? undefined : { x: 5 }"
             :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
@@ -107,7 +109,7 @@ useGsapContext(section, ({ reducedMotion }) => {
               <small>{{ channel.detail }}</small>
             </span>
             <Icon class="contact-channel__arrow" icon="mdi:arrow-top-right" aria-hidden="true" />
-          </motion.div>
+          </motion.a>
         </div>
       </RetroWindow>
 
@@ -244,6 +246,8 @@ useGsapContext(section, ({ reducedMotion }) => {
   align-items: center;
   padding: 1rem .25rem 1rem;
   border-top: 1px solid var(--border);
+  color: inherit;
+  text-decoration: none;
 }
 .contact-channel svg { width: 1rem; height: 1rem; color: var(--accent-bright); }
 

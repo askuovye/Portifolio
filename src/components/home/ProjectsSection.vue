@@ -8,6 +8,7 @@ import RetroWindow from '@/components/ui/RetroWindow.vue'
 import projectPlaceholder from '@/assets/elements/placeholder.png'
 import kinect from '@/assets/animations/kinect-galery.gif'
 import ecolink from '@/assets/animations/ecolink.gif'
+import vestock from '@/assets/elements/vestock.png'
 import chatbot from '@/assets/elements/chatbot.jpeg'
 import { gsap } from '@/animations/gsap'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
@@ -20,7 +21,7 @@ interface ProjectSummary {
 }
 
 const projects: ProjectSummary[] = [
-  { name: 'Vestock', image: projectPlaceholder, technologies: ['Vue.js', 'Laravel', 'Postgre'] },
+  { name: 'Vestock', image: vestock, technologies: ['Vue.js', 'Laravel', 'Postgre'] },
   { name: 'Ecolink', image: ecolink, technologies: ['Laravel', 'Flutter', 'MySQL'] },
   { name: 'Chatbot Langchain', image: chatbot, technologies: ['Python', 'LangChain', 'GrokAPI'] },
   { name: 'Kinect Galery', image: kinect, technologies: ['Vue.js', 'SCSS', 'JS'] },
@@ -30,7 +31,7 @@ const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
 
 useGsapContext(section, ({ reducedMotion }) => {
-  const title = section.value?.querySelector('.projects-section__title')
+  const title = section.value?.querySelector('.projects-section__title')  
   const cards = section.value?.querySelectorAll('.project-summary')
   const footer = section.value?.querySelector('.projects-section__footer')
   if (!title || !cards?.length || !footer) return

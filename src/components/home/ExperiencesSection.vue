@@ -3,6 +3,8 @@ import { ref } from 'vue'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
+import ScrollVideo from '@/components/ui/ScrollVideo.vue'
+import nokiaVideo from '@/assets/animations/nokia.mp4'
 import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
 
@@ -124,6 +126,18 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 <template>
   <section ref="section" class="experiences" aria-labelledby="experiences-title">
+    <aside class="experiences__video-track" aria-label="Animação Nokia controlada pela rolagem">
+      <ScrollVideo
+        id="home-nokia"
+        class="experiences__video-frame"
+        :src="nokiaVideo"
+        :priority="10"
+        trigger-selector=".experiences"
+        start="top top+=88"
+        end="bottom bottom-=48"
+      />
+    </aside>
+
     <div class="experiences__heading">
       <div>
         <p class="experiences__eyebrow">HISTÓRICO_PROFISSIONAL.LOG</p>
@@ -182,8 +196,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 .experiences {
   position: relative;
   padding: var(--section-space) clamp(.75rem, 4vw, 4rem);
-  overflow: hidden;
-  border: 1px solid var(--border);
+  overflow: visible;
   border-top: 0;
   background:
     linear-gradient(rgb(255 255 255 / 2%) 1px, transparent 1px),
@@ -200,7 +213,29 @@ useGsapContext(section, ({ reducedMotion }) => {
   font-family: var(--font-mono);
   font-size: .62rem;
   letter-spacing: .12em;
-  content: 'SYS://CAREER/ARCHIVE';
+}
+
+.experiences__video-track {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+}
+
+.experiences__video-frame {
+  position: sticky;
+  top: clamp(5rem, 9vh, 7rem);
+  width: clamp(40rem, 13vw, 12rem);
+  height: clamp(41rem, 18vw, 17rem);
+  margin-left: auto;
+  transform: translateX(60%) rotate(-12deg);
+}
+
+.experiences__heading,
+.timeline,
+.experiences__footer {
+  position: relative;
+  z-index: 1;
 }
 
 .experiences__heading {
@@ -365,11 +400,15 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 @include breakpoint-down($breakpoint-tablet) {
   .experiences__heading { grid-template-columns: 1fr; align-items: start; }
+  .experiences__video-frame {
+    transform: translateX(47%) rotate(-12deg);
+  }
 }
 
 @include breakpoint-down($breakpoint-mobile) {
   .experiences { padding-inline: .75rem; }
   .experiences::before { display: none; }
+  .experiences__video-track { display: none; }
   .experiences__heading { margin-bottom: 3rem; }
   .timeline { gap: 2.25rem; padding-left: 2.8rem; }
   .timeline__rail { left: 1rem; }
