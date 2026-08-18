@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
@@ -10,6 +10,7 @@ import devmodeBadge from '@/assets/elements/devmode-badge.png'
 import barCode from '@/assets/elements/barcode.png'
 import heroBadge from '@/assets/elements/hero-badge.png'
 import paperImage from '@/assets/elements/paper.png'
+import chainsVideo from '@/assets/animations/chains.mp4'
 import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
 
@@ -17,6 +18,11 @@ const prefersReducedMotion = useReducedMotion()
 const hero = ref<HTMLElement | null>(null)
 const profileWindow = ref<HTMLElement | null>(null)
 const profileImageReveal = ref<HTMLElement | null>(null)
+const chains = ref<HTMLElement | null>(null)
+const chainsPlayer = ref<HTMLVideoElement | null>(null)
+const isDesktop = ref(false)
+let chainsObserver: IntersectionObserver | undefined
+let desktopMedia: MediaQueryList | undefined
 
 useGsapContext(hero, ({ reducedMotion }) => {
   if (!profileWindow.value || !profileImageReveal.value) return
@@ -26,7 +32,8 @@ useGsapContext(hero, ({ reducedMotion }) => {
     return
   }
 
-  gsap.timeline({ delay: 0.45 })
+  const timeline = gsap.timeline({ delay: 0.45 })
+  timeline
     .from(profileWindow.value, {
       x: 50,
       opacity: 0,
@@ -47,6 +54,46 @@ useGsapContext(hero, ({ reducedMotion }) => {
       ease: 'power3.inOut',
       clearProps: 'clipPath',
     }, '<0.08')
+})
+
+const stopChains = () => {
+  chainsPlayer.value?.pause()
+}
+
+const observeChains = async () => {
+  chainsObserver?.disconnect()
+  stopChains()
+  if (!isDesktop.value || prefersReducedMotion.value) return
+
+  await nextTick()
+  if (!hero.value || !chainsPlayer.value) return
+
+  chainsObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return
+    if (entry.isIntersecting) void chainsPlayer.value?.play().catch(() => undefined)
+    else stopChains()
+  }, { threshold: 0.08 })
+
+  chainsObserver.observe(hero.value)
+}
+
+const updateDesktop = () => {
+  isDesktop.value = Boolean(desktopMedia?.matches)
+}
+
+watch([isDesktop, prefersReducedMotion], () => { void observeChains() })
+
+onMounted(() => {
+  if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
+  desktopMedia = window.matchMedia('(min-width: 38.0625rem)')
+  desktopMedia.addEventListener('change', updateDesktop)
+  updateDesktop()
+})
+
+onBeforeUnmount(() => {
+  chainsObserver?.disconnect()
+  desktopMedia?.removeEventListener('change', updateDesktop)
+  stopChains()
 })
 
 const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
@@ -92,6 +139,16 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
     <motion.div class="vertical-note deco" v-bind="enter(0.82)">DESIGN + CODE + CREATE</motion.div>
     <motion.img class="barcode" :src="barCode" alt="one of a kind" v-bind="enter(0.68)" />
     <motion.div class="disposable deco" v-bind="enter(0.9)"><Icon class="disposable__icon" icon="mdi:recycle" aria-hidden="true" /><span>NON-DISPOSABLE</span></motion.div>
+    <div v-if="isDesktop && !prefersReducedMotion" ref="chains" class="hero__chains" aria-hidden="true">
+      <video
+        ref="chainsPlayer"
+        :src="chainsVideo"
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      />
+    </div>
   </section>
 </template>
 
@@ -99,7 +156,7 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
 @use '@/styles/variables' as *;
 @use '@/styles/mixins' as *;
 
-.hero { position: relative; min-height: clamp(40rem, 69vw, 51rem); padding: clamp(2.2rem, 6vw, 5.2rem) clamp(1rem, 8vw, 8.5rem) 7rem; overflow: hidden; border-bottom: 1px solid var(--border); }
+.hero { position: relative; min-height: clamp(40rem, 69vw, 51rem); padding: clamp(2.2rem, 6vw, 5.2rem) clamp(1rem, 8vw, 8.5rem) 7rem; overflow: visible; border-bottom: 1px solid var(--border); }
 .hero__accessible-name { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .hero__content { position: relative; z-index: 4; width: min(55%, 47rem); margin-left: clamp(1rem, 5vw, 4.5rem); }
 .hero__hello { margin: 0 0 .05rem; color: white; font-family: var(--font-display); font-size: clamp(2rem, 5.2vw, 5.1rem); line-height: 1; text-transform: uppercase; }
@@ -125,10 +182,26 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
 .coordinates__globe { display: grid; width: 3.4rem; height: 3.4rem; margin-bottom: .5rem; place-items: center; border: 1px solid white; border-radius: 50%; color: white; font-size: 2.5rem; }
 .coordinates strong { margin-top: .25rem; color: white; font-weight: 400; }
 .vertical-note { right: .4rem; bottom: 15rem; writing-mode: vertical-rl; font-size: 1.2rem;color: white; letter-spacing: .12em; }
-.barcode { position: absolute; z-index: 3; left: 1.4rem; bottom: 3.5rem; width: clamp(6.5rem, 9vw, 8.5rem); height: auto; object-fit: contain;
+.barcode { position: absolute; z-index: 3; left: .4rem; bottom: 3.5rem; width: clamp(4.5rem, 4vw, 8.5rem); height: auto; object-fit: contain;
 }
 .disposable { right: .4rem; bottom: 5rem; display: flex; align-items: center; flex-direction: column; gap: .15rem; color: white; writing-mode: vertical-rl; }
 .disposable__icon { width: 1.7rem; height: 1.7rem; color: var(--accent-bright); }
+.hero__chains {
+  position: absolute;
+  z-index: 1;  bottom: 2.5rem;
+  width: min(82%);
+  height: clamp(25rem, 20vw, 15rem);
+  transform: translateX(-50%) rotate(53deg);
+  overflow: visible;
+  pointer-events: none;
+}
+.hero__chains video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
 
 .portrait-badge {
   animation: stack-card-flip 660ms steps(2, jump-none) infinite;
@@ -168,5 +241,6 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
   .hero__badge { right: .35rem; bottom: 4rem; width: 11rem; }
   .barcode { display: none; }
   .desktop-only { display: none; }
+  .hero__chains { display: none; }
 }
 </style>
