@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { AnimatePresence, motion, useReducedMotion } from 'motion-v'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
+import PageLoader from '@/components/ui/PageLoader.vue'
+import { usePageLoader } from '@/composables/usePageLoader'
 
 interface NavigationItem {
   label: string
@@ -20,6 +22,7 @@ const navigation: NavigationItem[] = [
 const route = useRoute()
 const isMenuOpen = ref(false)
 const prefersReducedMotion = useReducedMotion()
+const pageLoader = usePageLoader()
 
 const closeMenu = () => {
   isMenuOpen.value = false
@@ -33,12 +36,48 @@ const handleEscape = (event: KeyboardEvent) => {
   if (event.key === 'Escape') closeMenu()
 }
 
-watch(() => route.fullPath, closeMenu)
+const waitForCriticalAssets = async (runId: number) => {
+  await nextTick()
+  await new Promise<void>((resolve) => window.requestAnimationFrame(() => resolve()))
+  pageLoader.setProgress(38, 'LOADING_FONTS')
+
+  if ('fonts' in document) {
+    await Promise.race([
+      document.fonts.ready,
+      new Promise((resolve) => window.setTimeout(resolve, 1200)),
+    ])
+  }
+
+  pageLoader.setProgress(68, 'LOADING_VISIBLE_ASSETS')
+  const visibleImages = [...document.querySelectorAll<HTMLImageElement>('main img')]
+    .filter((image) => image.loading !== 'lazy' && image.getBoundingClientRect().top < window.innerHeight * 1.25)
+
+  await Promise.allSettled(visibleImages.map(async (image) => {
+    if (!image.complete) {
+      await new Promise<void>((resolve) => {
+        image.addEventListener('load', () => resolve(), { once: true })
+        image.addEventListener('error', () => resolve(), { once: true })
+      })
+    }
+    await image.decode?.().catch(() => undefined)
+  }))
+
+  pageLoader.setProgress(94, 'RENDERING_PAGE')
+  pageLoader.finish(runId)
+}
+
+watch(() => route.fullPath, (path) => {
+  closeMenu()
+  const routeName = String(route.name ?? (path.replace(/\//g, '') || 'HOME'))
+  const runId = pageLoader.start(routeName)
+  void waitForCriticalAssets(runId)
+}, { immediate: true })
 onMounted(() => window.addEventListener('keydown', handleEscape))
 onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
 </script>
 
 <template>
+  <PageLoader />
   <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
 
   <div class="site-shell">

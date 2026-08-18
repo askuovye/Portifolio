@@ -130,6 +130,21 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
 .disposable { right: .4rem; bottom: 5rem; display: flex; align-items: center; flex-direction: column; gap: .15rem; color: white; writing-mode: vertical-rl; }
 .disposable__icon { width: 1.7rem; height: 1.7rem; color: var(--accent-bright); }
 
+.portrait-badge {
+  animation: stack-card-flip 660ms steps(2, jump-none) infinite;
+  animation-fill-mode: both;
+  animation-play-state: running;
+}
+
+@keyframes stack-card-flip {
+  0% {
+    transform: rotate(1deg);
+  }
+  100% {
+    transform: rotate(-1deg);
+  }
+}
+
 @include breakpoint-down($breakpoint-tablet) {
   .hero { min-height: auto; padding: 3rem 1rem 6rem; }
   .hero__content { width: 62%; margin-left: 0; }
