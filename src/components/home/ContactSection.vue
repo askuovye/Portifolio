@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
@@ -8,6 +8,7 @@ import SectionTitle from '@/components/ui/SectionTitle.vue'
 import { gsap } from '@/animations/gsap'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
 import { useGsapContext } from '@/composables/useGsapContext'
+import worldVideo from '@/assets/animations/world.mp4'
 
 interface ContactChannel {
   label: string
@@ -16,15 +17,59 @@ interface ContactChannel {
   href: string
 }
 
+const isExternalLink = (href: string) => /^https?:\/\//i.test(href)
+
 const channels: ContactChannel[] = [
   { label: 'Email', detail: 'Resposta direta', icon: 'mdi:email-outline', href: '#' },
-  { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin', href: '#' },
-  { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github', href: '#' },
+  { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/joaolopesfortes/' },
+  { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github', href: 'https://github.com/askuovye' },
   { label: 'WhatsApp', detail: 'Conversa rápida', icon: 'mdi:whatsapp', href: '#' },
 ]
 
 const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
+const worldPlayer = ref<HTMLVideoElement | null>(null)
+const isDesktop = ref(false)
+let worldObserver: IntersectionObserver | undefined
+let desktopMedia: MediaQueryList | undefined
+
+const pauseWorld = () => worldPlayer.value?.pause()
+
+const observeWorld = async () => {
+  worldObserver?.disconnect()
+  pauseWorld()
+  if (!isDesktop.value) return
+
+  await nextTick()
+  if (!section.value || !worldPlayer.value) return
+
+  worldObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return
+    if (entry.isIntersecting) void worldPlayer.value?.play().catch(() => undefined)
+    else pauseWorld()
+  }, { threshold: 0.08 })
+
+  worldObserver.observe(section.value)
+}
+
+const updateDesktop = () => {
+  isDesktop.value = Boolean(desktopMedia?.matches)
+}
+
+watch(isDesktop, () => { void observeWorld() })
+
+onMounted(() => {
+  if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
+  desktopMedia = window.matchMedia('(min-width: 38.0625rem)')
+  desktopMedia.addEventListener('change', updateDesktop)
+  updateDesktop()
+})
+
+onBeforeUnmount(() => {
+  worldObserver?.disconnect()
+  desktopMedia?.removeEventListener('change', updateDesktop)
+  pauseWorld()
+})
 
 useGsapContext(section, ({ reducedMotion }) => {
   const heading = section.value?.querySelector('.contact__heading')
@@ -98,6 +143,8 @@ useGsapContext(section, ({ reducedMotion }) => {
             v-for="(channel, index) in channels"
             :key="channel.label"
             :href="channel.href"
+            :target="isExternalLink(channel.href) ? '_blank' : undefined"
+            :rel="isExternalLink(channel.href) ? 'noopener noreferrer' : undefined"
             class="contact-channel"
             :while-hover="prefersReducedMotion ? undefined : { x: 5 }"
             :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
@@ -113,8 +160,17 @@ useGsapContext(section, ({ reducedMotion }) => {
         </div>
       </RetroWindow>
 
-      <aside class="contact__channels" aria-label="Canais de contato disponíveis">
-        
+      <aside class="contact__channels" aria-hidden="true">
+        <video
+          v-if="isDesktop"
+          ref="worldPlayer"
+          class="contact__world"
+          :src="worldVideo"
+          muted
+          loop
+          playsinline
+          preload="metadata"
+        />
       </aside>
     </div>
 
@@ -137,7 +193,7 @@ useGsapContext(section, ({ reducedMotion }) => {
   padding: var(--section-space) clamp(.75rem, 4vw, 4rem) 2rem;
   border-top: 0;
   background:
-    radial-gradient(circle at 15% 45%, rgb(23 60 255 / 12%), transparent 28rem),
+    radial-gradient(circle at 25% 45%, rgb(23 60 255 / 12%), transparent 28rem),
     var(--background);
 }
 
@@ -237,7 +293,21 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 .contact__meta span { display: inline-flex; align-items: center; gap: .4rem; }
 .contact__meta svg { width: 1rem; height: 1rem; color: var(--accent-bright); }
-.contact__channels { min-width: 0; }
+.contact__channels {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 22rem;
+}
+
+.contact__world {
+  display: block;
+  width: min(300%);
+  height: auto;
+  max-height: 28rem;
+  object-fit: contain;
+}
 
 .contact-channel {
   display: grid;
@@ -300,5 +370,6 @@ useGsapContext(section, ({ reducedMotion }) => {
   .contact__meta { align-items: flex-start; flex-direction: column; }
   .contact__ticker { justify-content: center; }
   .contact__ticker span:nth-child(n + 3) { display: none; }
+  .contact__channels { display: none; }
 }
 </style>

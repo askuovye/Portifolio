@@ -123,6 +123,8 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 .stack {
   position: relative;
+  z-index: 2;
+  isolation: isolate;
   padding: clamp(2rem, 4vw, 4rem) clamp(.35rem, 2vw, 2rem);
   overflow: hidden;
   border: 1px solid var(--border);
@@ -134,10 +136,14 @@ useGsapContext(section, ({ reducedMotion }) => {
 }
 
 .stack__title {
+  position: relative;
+  z-index: 2;
   margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .stack__grid {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(4rem, 3vw, 1rem);
