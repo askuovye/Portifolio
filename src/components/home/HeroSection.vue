@@ -182,7 +182,7 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
 .coordinates__globe { display: grid; width: 3.4rem; height: 3.4rem; margin-bottom: .5rem; place-items: center; border: 1px solid white; border-radius: 50%; color: white; font-size: 2.5rem; }
 .coordinates strong { margin-top: .25rem; color: white; font-weight: 400; }
 .vertical-note { right: .4rem; bottom: 15rem; writing-mode: vertical-rl; font-size: 1.2rem;color: white; letter-spacing: .12em; }
-.barcode { position: absolute; z-index: 3; left: .4rem; bottom: 3.5rem; width: clamp(4.5rem, 4vw, 8.5rem); height: auto; object-fit: contain;
+.barcode { position: absolute; z-index: 3; left: 1.4rem; bottom: 3.5rem; width: clamp(4.5rem, 4vw, .5rem); height: auto; object-fit: contain;
 }
 .disposable { right: .4rem; bottom: 5rem; display: flex; align-items: center; flex-direction: column; gap: .15rem; color: white; writing-mode: vertical-rl; }
 .disposable__icon { width: 1.7rem; height: 1.7rem; color: var(--accent-bright); }
