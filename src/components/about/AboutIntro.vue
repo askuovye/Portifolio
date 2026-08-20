@@ -1,14 +1,18 @@
 <script setup lang="ts">
+import { motion } from 'motion-v'
 import FakeCaptcha from './FakeCaptcha.vue'
+import { useEnterMotion } from '@/composables/useEnterMotion'
+
+const { enter } = useEnterMotion()
 </script>
 
 <template>
   <section class="about-intro" aria-labelledby="about-title">
     <div class="about-intro__copy">
-      <p class="about-intro__eyebrow">// ABOUT_ME.TXT</p>
-      <h1 id="about-title">João<br><span>Fortes</span></h1>
-      <p class="about-intro__role">Desenvolvedor Full Stack — Laravel & Vue.js</p>
-      <p class="about-intro__description">Construindo do banco de dados à interface. Graduando em Engenharia de Software em Guarapuava, PR.</p>
+      <motion.p class="about-intro__eyebrow" v-bind="enter(0.05)">// ABOUT_ME.TXT</motion.p>
+      <motion.h1 id="about-title" v-bind="enter(0.12)">João<br><span>Fortes</span></motion.h1>
+      <motion.p class="about-intro__role" v-bind="enter(0.2)">Desenvolvedor Full Stack — Laravel & Vue.js</motion.p>
+      <motion.p class="about-intro__description" v-bind="enter(0.28)">Construindo do banco de dados à interface. Graduando em Engenharia de Software em Guarapuava, PR.</motion.p>
     </div>
     <FakeCaptcha class="captcha"/>
   </section>

@@ -1,13 +1,43 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import AboutIntro from '@/components/about/AboutIntro.vue'
 import ContactLinks from '@/components/about/ContactLinks.vue'
 import PersonalBackground from '@/components/about/PersonalBackground.vue'
 import TechnicalIdentity from '@/components/about/TechnicalIdentity.vue'
 import WorkSummary from '@/components/about/WorkSummary.vue'
+import { gsap } from '@/animations/gsap'
+import { useGsapContext } from '@/composables/useGsapContext'
+
+const page = ref<HTMLElement | null>(null)
+
+useGsapContext(page, ({ reducedMotion }) => {
+  const windows = page.value?.querySelectorAll<HTMLElement>('.retro-window')
+  if (!windows?.length) return
+
+  if (reducedMotion) {
+    gsap.set(windows, { clearProps: 'clipPath' })
+    return
+  }
+
+  windows.forEach((window) => {
+    gsap.from(window, {
+      clipPath: 'inset(0 0 100% 0)',
+      duration: 0.8,
+      ease: 'power3.inOut',
+      clearProps: 'clipPath',
+      delay: window.classList.contains('captcha') ? 0.75 : 0,
+      scrollTrigger: {
+        trigger: window,
+        start: 'top 88%',
+        once: true,
+      },
+    })
+  })
+})
 </script>
 
 <template>
-  <div class="about-content">
+  <div ref="page" class="about-content">
     <AboutIntro />
     <TechnicalIdentity />
     <div class="about-story-grid">

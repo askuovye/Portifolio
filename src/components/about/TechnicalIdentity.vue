@@ -1,8 +1,15 @@
+<script setup lang="ts">
+import { motion } from 'motion-v'
+import { useEnterMotion } from '@/composables/useEnterMotion'
+
+const { enter } = useEnterMotion()
+</script>
+
 <template>
   <section class="technical-identity" aria-labelledby="technical-identity-title">
     <div class="technical-identity__content">
-      <h3 id="technical-identity-title">Identidade<br>Técnica</h3>
-      <p>Construo aplicações full stack com Laravel e Vue, mas também gosto de mexer onde a maioria não vai — de matemática de câmera 3D em jogos até debugar driver de kernel no Linux quando a solução óbvia não existe.</p>
+      <motion.h3 id="technical-identity-title" v-bind="enter(0.08)">Identidade<br>Técnica</motion.h3>
+      <motion.p v-bind="enter(0.16)">Construo aplicações full stack com Laravel e Vue, mas também gosto de mexer onde a maioria não vai — de matemática de câmera 3D em jogos até debugar driver de kernel no Linux quando a solução óbvia não existe.</motion.p>
     </div>
   </section>
 </template>
@@ -29,10 +36,10 @@
   gap: clamp(2rem, 8vw, 8rem);
 }
 
-h2 {
+h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 7vw, 7rem);
+  font-size: clamp(2.5rem, 5vw, 5rem);
   font-weight: 400;
   line-height: .78;
   text-transform: uppercase;

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
+import { motion } from 'motion-v'
 import { RouterLink } from 'vue-router'
+import { useEnterMotion } from '@/composables/useEnterMotion'
+
+const { enter } = useEnterMotion()
 
 interface ContactLink {
   label: string
@@ -48,13 +52,13 @@ const links: ContactLink[] = [
 <template>
   <section class="contact-links" aria-labelledby="contact-links-title">
     <div class="contact-links__heading">
-      <p>// CONTACT_DIRECTORY</p>
-      <h2 id="contact-links-title">Onde me<br><span>achar?</span></h2>
-      <p class="contact-links__intro">Aberto a projetos, colaborações e boas conversas sobre tecnologia.</p>
+      <motion.p v-bind="enter(0.05)">// CONTACT_DIRECTORY</motion.p>
+      <motion.h2 id="contact-links-title" v-bind="enter(0.12)">Onde me<br><span>achar?</span></motion.h2>
+      <motion.p class="contact-links__intro" v-bind="enter(0.2)">Aberto a projetos, colaborações e boas conversas sobre tecnologia.</motion.p>
     </div>
 
     <ol class="contact-links__list">
-      <li v-for="(link, index) in links" :key="link.label">
+      <motion.li v-for="(link, index) in links" :key="link.label" v-bind="enter(0.08 + index * 0.06)">
         <component
           :is="link.available === false ? 'div' : (link.to ? RouterLink : 'a')"
           class="contact-link"
@@ -73,7 +77,7 @@ const links: ContactLink[] = [
           </span>
           <span class="contact-link__arrow" aria-hidden="true">{{ link.available === false ? '—' : '↗' }}</span>
         </component>
-      </li>
+      </motion.li>
     </ol>
   </section>
 </template>

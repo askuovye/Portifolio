@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { motion } from 'motion-v'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import profileImage from '@/assets/profile-joao.jpeg'
 import chatbotImage from '@/assets/elements/chatbot.jpeg'
+import { useEnterMotion } from '@/composables/useEnterMotion'
+
+const { enter } = useEnterMotion()
 
 interface CaptchaTile {
   id: number
@@ -46,8 +50,8 @@ const reset = () => {
   <RetroWindow class="captcha" title="human_check.exe" close-label="Janela decorativa de verificação">
     <div class="captcha__body">
       <header class="captcha__prompt">
-        <h2>Selecione todos os quadrados com <strong>UM CARA MANEIRO</strong></h2>
-        <p>Clique nas 9 imagens para revelar a identidade.</p>
+        <motion.h2 v-bind="enter(0.82)">Selecione todos os quadrados com <strong>UM CARA MANEIRO</strong></motion.h2>
+        <motion.p v-bind="enter(0.9)">Clique nas 9 imagens para revelar a identidade.</motion.p>
       </header>
 
       <div class="captcha__grid" :class="{ 'captcha__grid--complete': isComplete }" role="group" aria-label="Desafio visual com nove imagens">
