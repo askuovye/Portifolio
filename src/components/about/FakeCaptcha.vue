@@ -3,10 +3,18 @@ import { computed, ref } from 'vue'
 import { motion } from 'motion-v'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import profileImage from '@/assets/profile-joao.jpeg'
-import chatbotImage from '@/assets/elements/chatbot.jpeg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 const { enter } = useEnterMotion()
+
+interface CaptchaImage {
+  src: string
+  position?: string
+}
+
+const props = defineProps<{
+  images: CaptchaImage[]
+}>()
 
 interface CaptchaTile {
   id: number
@@ -15,23 +23,17 @@ interface CaptchaTile {
   finalPosition: string
 }
 
-const initialCrops = [
-  'center 12%', 'center 32%', 'center 55%',
-  'left 22%', 'center 45%', 'right 28%',
-  'left 70%', 'center 78%', 'right 68%',
-]
-
-const tiles: CaptchaTile[] = Array.from({ length: 9 }, (_, index) => ({
+const tiles = computed<CaptchaTile[]>(() => Array.from({ length: 9 }, (_, index) => ({
   id: index,
-  initialImage: index % 3 === 1 ? chatbotImage : profileImage,
-  initialPosition: initialCrops[index] ?? 'center',
+  initialImage: props.images[index]?.src ?? profileImage,
+  initialPosition: props.images[index]?.position ?? 'center',
   finalPosition: `${(index % 3) * 50}% ${Math.floor(index / 3) * 50}%`,
-}))
+})))
 
 const revealed = ref<boolean[]>(Array.from({ length: 9 }, () => false))
 const isVerified = ref(false)
 const revealedCount = computed(() => revealed.value.filter(Boolean).length)
-const isComplete = computed(() => revealedCount.value === tiles.length)
+const isComplete = computed(() => revealedCount.value === tiles.value.length)
 
 const revealTile = (index: number) => {
   if (revealed.value[index]) return
