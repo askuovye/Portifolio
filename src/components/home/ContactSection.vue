@@ -20,10 +20,10 @@ interface ContactChannel {
 const isExternalLink = (href: string) => /^https?:\/\//i.test(href)
 
 const channels: ContactChannel[] = [
-  { label: 'Email', detail: 'Resposta direta', icon: 'mdi:email-outline', href: '#' },
+  { label: 'Email', detail: 'john.lopes.fortes@gmail.com', icon: 'mdi:email-outline', href: 'mailto:john.lopes.fortes@gmail.com' },
   { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/joaolopesfortes/' },
   { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github', href: 'https://github.com/askuovye' },
-  { label: 'WhatsApp', detail: 'Conversa rápida', icon: 'mdi:whatsapp', href: '#' },
+  { label: 'WhatsApp', detail: '42984431307', icon: 'mdi:whatsapp', href: 'https://wa.me/+5542984431307' },
 ]
 
 const section = ref<HTMLElement | null>(null)

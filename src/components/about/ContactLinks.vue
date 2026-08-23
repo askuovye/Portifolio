@@ -75,21 +75,21 @@ const links: ContactLink[] = [
   },
   {
     label: 'Email',
-    detail: 'Mensagem direta',
+    detail: 'john.lopes.fortes@gmail.com',
     icon: 'mdi:email-outline',
-    to: '/contact',
+    href: 'mailto:john.lopes.fortes@gmail.com',
   },
   {
     label: 'WhatsApp',
-    detail: 'Conversa rápida',
+    detail: '42984431307',
     icon: 'mdi:whatsapp',
-    to: '/contact',
+    href: 'https://wa.me/+5542984431307',
   },
   {
     label: 'Currículo',
-    detail: 'Disponível em breve',
+    detail: 'Baixar PDF',
     icon: 'mdi:file-document-outline',
-    available: false,
+    href: '/resume/joao-fortes-pt-BR.pdf',
   },
 ]
 </script>
