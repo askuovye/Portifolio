@@ -1,23 +1,86 @@
 <script setup lang="ts">
+import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { motion } from 'motion-v'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import hdVideo from '@/assets/animations/hd.mp4'
+import windowsImage from '@/assets/elements/windows.png'
 
 const { enter } = useEnterMotion()
+const section = ref<HTMLElement | null>(null)
+const hdPlayer = ref<HTMLVideoElement | null>(null)
+const isDesktop = ref(false)
+let hdObserver: IntersectionObserver | undefined
+let desktopMedia: MediaQueryList | undefined
+
+const pauseHd = () => hdPlayer.value?.pause()
+
+const observeHd = async () => {
+  hdObserver?.disconnect()
+  pauseHd()
+  if (!isDesktop.value) return
+
+  await nextTick()
+  if (!section.value || !hdPlayer.value) return
+
+  hdObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return
+    if (entry.isIntersecting) void hdPlayer.value?.play().catch(() => undefined)
+    else pauseHd()
+  }, { threshold: 0.08 })
+
+  hdObserver.observe(section.value)
+}
+
+const updateDesktop = () => {
+  isDesktop.value = Boolean(desktopMedia?.matches)
+}
+
+watch(isDesktop, () => { void observeHd() })
+
+onMounted(() => {
+  if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
+  desktopMedia = window.matchMedia('(min-width: 38.0625rem)')
+  desktopMedia.addEventListener('change', updateDesktop)
+  updateDesktop()
+})
+
+onBeforeUnmount(() => {
+  hdObserver?.disconnect()
+  desktopMedia?.removeEventListener('change', updateDesktop)
+  pauseHd()
+})
 </script>
 
 <template>
-  <section class="technical-identity" aria-labelledby="technical-identity-title">
-    <div class="technical-identity__content">
-      <motion.h3 id="technical-identity-title" v-bind="enter(0.08)">Identidade<br>Técnica</motion.h3>
-      <motion.p v-bind="enter(0.16)">Construo aplicações full stack com Laravel e Vue, mas também gosto de mexer onde a maioria não vai — de matemática de câmera 3D em jogos até debugar driver de kernel no Linux quando a solução óbvia não existe.</motion.p>
-    </div>
-  </section>
+  <div class="technical-identity-shell">
+    <section ref="section" class="technical-identity" aria-labelledby="technical-identity-title">
+      <div class="technical-identity__content">
+        <motion.h3 id="technical-identity-title" v-bind="enter(0.08)">Identidade<br>Técnica</motion.h3>
+        <motion.p v-bind="enter(0.16)">Construo aplicações full stack com Laravel e Vue, mas também gosto de mexer onde a maioria não vai — de matemática de câmera 3D em jogos até debugar driver de kernel no Linux quando a solução óbvia não existe.</motion.p>
+      </div>
+    </section>
+    <video
+      v-if="isDesktop"
+      ref="hdPlayer"
+      class="technical-identity__hd"
+      :src="hdVideo"
+      muted
+      loop
+      playsinline
+      preload="metadata"
+      aria-hidden="true"
+    />
+    <img class="technical-identity__windows" :src="windowsImage" alt="" aria-hidden="true">
+  </div>
 </template>
 
 <style scoped lang="scss">
+.technical-identity-shell {
+  position: relative;
+}
+
 .technical-identity {
   padding: clamp(2rem, 5vw, 5rem);
-  border: 1px solid var(--border);
   background: var(--background);
 }
 
@@ -30,10 +93,35 @@ const { enter } = useEnterMotion()
 }
 
 .technical-identity__content {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(15rem, .8fr) minmax(18rem, 1.2fr);
   align-items: start;
   gap: clamp(2rem, 8vw, 8rem);
+}
+
+.technical-identity__hd {
+  position: absolute;
+  z-index: 0;
+  top: clamp(-7.5rem, -8vw, -6.5rem);
+  left: clamp(-6rem, -5vw, -1rem);
+  width: clamp(8rem, 15vw, 14rem);
+  height: auto;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.technical-identity__windows {
+  position: absolute;
+  z-index: 2;
+  right: clamp(-5rem, -4vw, -.95rem);
+  bottom: clamp(-3rem, -3vw, -1.5rem);
+  width: clamp(13rem, 20vw, 15rem);
+  height: auto;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  user-select: none;
 }
 
 h3 {
@@ -56,5 +144,11 @@ h3 {
 
 @media (max-width: 48rem) {
   .technical-identity__content { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 38rem) {
+  .technical-identity { min-height: auto; }
+  .technical-identity__hd { display: none; }
+  .technical-identity__windows { right: -.5rem; bottom: -2rem; width: 8rem; }
 }
 </style>
