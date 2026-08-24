@@ -55,7 +55,11 @@ const emit = defineEmits<{
 @use '@/styles/mixins' as *;
 
 .playlist {
+  display: flex;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  flex-direction: column;
   padding: .75rem;
   border: 1px solid #4c4c4c;
   background: #080808;
@@ -86,8 +90,13 @@ const emit = defineEmits<{
 }
 
 .playlist__tracks {
+  min-height: 0;
   margin: .3rem 0 0;
   padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-color: var(--accent) #111;
+  scrollbar-width: thin;
   list-style: none;
 }
 
@@ -173,11 +182,13 @@ const emit = defineEmits<{
 }
 
 @include breakpoint-down($breakpoint-tablet) {
+  .playlist { height: auto; }
   .playlist__tracks {
     display: flex;
     gap: .5rem;
     padding-bottom: .5rem;
     overflow-x: auto;
+    overflow-y: hidden;
     scroll-snap-type: x mandatory;
     scrollbar-color: var(--accent) #111;
   }

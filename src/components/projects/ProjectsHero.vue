@@ -1,56 +1,97 @@
 <script setup lang="ts">
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { motion } from 'motion-v'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import computerVideo from '@/assets/animations/computer.mp4'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
+const section = ref<HTMLElement | null>(null)
+const computerPlayer = ref<HTMLVideoElement | null>(null)
+let computerObserver: IntersectionObserver | undefined
+
+const pauseComputer = () => computerPlayer.value?.pause()
+
+onMounted(() => {
+  if (!section.value || !computerPlayer.value || typeof window.IntersectionObserver !== 'function') return
+
+  computerObserver = new IntersectionObserver(([entry]) => {
+    if (entry?.isIntersecting) void computerPlayer.value?.play().catch(() => undefined)
+    else pauseComputer()
+  }, { threshold: .08 })
+
+  computerObserver.observe(section.value)
+})
+
+onBeforeUnmount(() => {
+  computerObserver?.disconnect()
+  pauseComputer()
+})
 </script>
 
 <template>
-  <section class="projects-hero" aria-labelledby="projects-title">
-    <motion.div class="projects-hero__meta" v-bind="enter(.04)">
-      <span>ARQUIVO_01</span>
-      <span>PROJECTS.DIR</span>
-    </motion.div>
-    <div class="projects-hero__copy">
-      <motion.p v-bind="enter(.08)">PORTFÓLIO / SELECT TRACK</motion.p>
-      <motion.h1 id="projects-title" v-bind="enter(.14)">Projetos</motion.h1>
-      <motion.p class="projects-hero__intro" v-bind="enter(.22)">
-        Sistemas, aplicações e experiências digitais organizados como faixas de um arquivo pessoal.
-      </motion.p>
+  <section ref="section" class="projects-hero" aria-labelledby="projects-title">
+    <div class="projects-hero__content">
+      <motion.h1 id="projects-title" v-bind="enter(0.38)">Projetos</motion.h1>
+      <div class="projects-hero__copy">
+        <motion.p v-bind="enter(0.14)">Desenvolvo sites, sistemas, aplicações e até games no meu tempo livre.</motion.p>
+        <motion.p v-bind="enter(0.2)">Meus principais sistemas. Vamos dar uma olhada?</motion.p>
+      </div>
     </div>
-    <span class="projects-hero__catalog" aria-hidden="true">DEV.MP3</span>
+    <motion.div class="projects-hero__computer" v-bind="enter(.16, { scale: .9 })" aria-hidden="true">
+      <video ref="computerPlayer" :src="computerVideo" muted loop playsinline preload="metadata" />
+    </motion.div>
   </section>
 </template>
 
 <style scoped lang="scss">
 .projects-hero {
   position: relative;
-  min-height: clamp(19rem, 38vw, 34rem);
-  padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 4vw, 4rem) clamp(3rem, 7vw, 6rem);
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-bottom: 0;
-  background:
-    radial-gradient(circle at 78% 45%, rgb(23 60 255 / 22%), transparent 28%),
-    linear-gradient(rgb(255 255 255 / 1.5%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 1.5%) 1px, transparent 1px),
-    var(--background);
-  background-size: auto, 28px 28px, 28px 28px, auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(13rem, 31rem);
+  align-items: center;
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+  padding: clamp(4rem, 9vw, 8rem) clamp(1rem, 4vw, 4rem);
 }
 
-.projects-hero__meta {
-  display: flex;
-  position: relative;
-  z-index: 2;
-  justify-content: space-between;
-  color: var(--text-secondary);
-  font-size: .65rem;
-  letter-spacing: .11em;
+.projects-hero__content,
+.projects-hero__computer { position: relative; z-index: 1; }
+
+.projects-hero h1 {
+  margin: 0;
+  font-size: clamp(4rem, 11vw, 10rem);
+  line-height: .78;
 }
 
-.projects-hero__copy { position: relative; z-index: 2; margin-top: clamp(3.5rem, 8vw, 7rem); }
-.projects-hero__copy > p:first-child { color: var(--accent-bright); font-size: .67rem; letter-spacing: .12em; }
-.projects-hero h1 { margin: .75rem 0 0; font-size: clamp(5rem, 14vw, 13rem); letter-spacing: -.04em; line-height: .62; }
-.projects-hero__intro { max-width: 34rem; margin: clamp(1.75rem, 4vw, 3rem) 0 0; padding-left: 1rem; border-left: 2px solid var(--accent); font-size: clamp(.78rem, 1.25vw, .95rem); line-height: 1.65; }
-.projects-hero__catalog { position: absolute; right: -1vw; bottom: -.22em; color: rgb(255 255 255 / 3.2%); font-family: var(--font-display); font-size: clamp(8rem, 24vw, 24rem); line-height: .65; pointer-events: none; }
+.projects-hero__copy {
+  display: grid;
+  gap: .65rem;
+  max-width: 44rem;
+}
+
+.projects-hero p { margin: 0; line-height: 1.65; }
+.projects-hero p:last-child { color: var(--text-secondary); }
+
+.projects-hero__computer {
+  display: grid;
+  width: min(100%, 28.6rem);
+  place-self: center;
+  place-items: center;
+}
+
+.projects-hero__computer video {
+  display: block;
+  width: 100%;
+  max-height: 23.4rem;
+  object-fit: contain;
+  filter: contrast(1.08) brightness(.88);
+}
+
+@media (max-width: 38rem) {
+  .projects-hero { grid-template-columns: 1fr; }
+  .projects-hero__computer { width: min(19.5rem, 83vw); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .projects-hero__computer video { display: none; }
+}
 </style>

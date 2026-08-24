@@ -1,20 +1,22 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
-import { useReducedMotion } from 'motion-v'
+import { motion, useReducedMotion } from 'motion-v'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import { gsap } from '@/animations/gsap'
+import { useEnterMotion } from '@/composables/useEnterMotion'
 import { projects } from '@/data/projects'
 import ProjectEqualizer from './ProjectEqualizer.vue'
 import ProjectNowPlaying from './ProjectNowPlaying.vue'
 import ProjectPlaylist from './ProjectPlaylist.vue'
 
 const activeProjectIndex = ref(0)
-const isPlaying = ref(false)
+const isPlaying = ref(true)
 const progress = ref(0)
 const player = ref<HTMLElement | null>(null)
 const nowPlayingContent = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
+const { enter } = useEnterMotion(.7)
 const activeProject = computed(() => projects[activeProjectIndex.value] ?? projects[0]!)
 const elapsedTime = computed(() => formatTime(activeProject.value.durationSeconds * progress.value / 100))
 
@@ -103,7 +105,7 @@ const handlePlayerKeydown = (event: KeyboardEvent) => {
 watch(isPlaying, (playing) => {
   if (playing) startProgressLoop()
   else stopProgressLoop()
-})
+}, { immediate: true })
 
 watch(activeProjectIndex, async () => {
   await nextTick()
@@ -134,7 +136,8 @@ onBeforeUnmount(() => {
     aria-label="Player de projetos. Use as setas para navegar e espaço para reproduzir ou pausar."
     @keydown="handlePlayerKeydown"
   >
-    <RetroWindow title="JOAO_DEV.MP3 — PROJECT PLAYER" close-label="Janela do player de projetos">
+    <motion.div v-bind="enter(.12, { scale: .985 })">
+      <RetroWindow title="JOAO_DEV.MP3 — PROJECT PLAYER" close-label="Janela do player de projetos">
       <div class="project-player__shell">
         <div class="project-player__display" aria-live="polite">
           <span aria-hidden="true">▶</span>
@@ -155,7 +158,7 @@ onBeforeUnmount(() => {
             @select="selectProject"
           />
           <div ref="nowPlayingContent" class="project-player__now-playing">
-            <ProjectNowPlaying :project="activeProject" />
+            <ProjectNowPlaying :project="activeProject" :is-playing="isPlaying" />
           </div>
         </div>
 
@@ -202,7 +205,8 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </div>
-    </RetroWindow>
+      </RetroWindow>
+    </motion.div>
   </section>
 </template>
 
@@ -235,17 +239,21 @@ onBeforeUnmount(() => {
 
 .project-player__marquee { min-width: 0; overflow: hidden; }
 .project-player__marquee p { width: max-content; margin: 0; color: inherit; font-size: clamp(.72rem, 1.4vw, 1.05rem); letter-spacing: .03em; text-transform: uppercase; animation: lcd-enter .35s steps(4); }
-.project-player__format { display: flex; align-items: center; gap: .45rem; }
+.project-player__format { display: flex; align-items: center; flex: 0 0 auto; gap: .45rem; }
 .project-player__format > span { padding: .2rem .35rem; border: 1px solid #387f42; font-size: .55rem; white-space: nowrap; }
+.project-player__format > :deep(.equalizer) { align-self: center; }
 
 .project-player__main {
   display: grid;
   grid-template-columns: minmax(19rem, .78fr) minmax(0, 1.22fr);
   gap: .35rem;
   margin-top: .45rem;
+  height: clamp(32rem, 62vh, 42rem);
+  min-height: 0;
 }
 
-.project-player__now-playing { min-width: 0; }
+.project-player__now-playing { min-width: 0; min-height: 0; }
+.project-player__now-playing > :deep(*) { height: 100%; }
 
 .project-player__controls {
   display: grid;
@@ -287,7 +295,7 @@ onBeforeUnmount(() => {
   color: #060606;
   cursor: pointer;
 }
-.project-player__transport button:hover { background: #dedede; }
+.project-player__transport button:hover { background: #112a83; }
 .project-player__transport button:active { box-shadow: inset 2px 2px #555, inset -1px -1px white; transform: translate(1px, 1px); }
 .project-player__transport svg { width: 1.7rem; height: 1.7rem; }
 .project-player__transport .project-player__play { background: #1636a8; color: white; }
@@ -317,7 +325,7 @@ onBeforeUnmount(() => {
 @keyframes lcd-enter { from { opacity: 0; transform: translateX(.75rem); } }
 
 @include breakpoint-down($breakpoint-tablet) {
-  .project-player__main { display: flex; flex-direction: column-reverse; }
+  .project-player__main { display: flex; height: auto; flex-direction: column-reverse; }
   .project-player__controls { grid-template-columns: 6.5rem 1fr 8rem; }
   .project-player__transport { justify-content: center; }
   .project-player__timeline { grid-column: 1 / -1; min-height: 3rem; }

@@ -6,9 +6,18 @@ describe('ProjectPlayer', () => {
   beforeEach(() => {
     vi.stubGlobal('requestAnimationFrame', vi.fn(() => 1))
     vi.stubGlobal('cancelAnimationFrame', vi.fn())
+    vi.stubGlobal('IntersectionObserver', class {
+      observe() {}
+      unobserve() {}
+      disconnect() {}
+    })
+    vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({
+      drawImage: vi.fn(),
+    } as unknown as CanvasRenderingContext2D)
   })
 
   afterEach(() => {
+    vi.restoreAllMocks()
     vi.unstubAllGlobals()
   })
 
@@ -34,14 +43,25 @@ describe('ProjectPlayer', () => {
 
   it('toggles its visual playback state', async () => {
     const wrapper = mount(ProjectPlayer)
-    const playButton = wrapper.get('[aria-label="Reproduzir apresentação"]')
+    const pauseButton = wrapper.get('[aria-label="Pausar apresentação"]')
 
-    await playButton.trigger('click')
-    expect(wrapper.get('[aria-label="Pausar apresentação"]').attributes('aria-label')).toBe('Pausar apresentação')
     expect(wrapper.get('.project-player__status').text()).toContain('Playing')
-
-    await wrapper.get('[aria-label="Pausar apresentação"]').trigger('click')
+    await pauseButton.trigger('click')
     expect(wrapper.get('[aria-label="Reproduzir apresentação"]').attributes('aria-label')).toBe('Reproduzir apresentação')
+
+    await wrapper.get('[aria-label="Reproduzir apresentação"]').trigger('click')
+    expect(wrapper.get('[aria-label="Pausar apresentação"]').attributes('aria-label')).toBe('Pausar apresentação')
+
+    wrapper.unmount()
+  })
+
+  it('renders complete equalizers in the display and playback status', () => {
+    const wrapper = mount(ProjectPlayer)
+    const displayEqualizer = wrapper.get('.project-player__format .equalizer')
+    const statusEqualizer = wrapper.get('.project-player__status .equalizer')
+
+    expect(displayEqualizer.findAll('i')).toHaveLength(7)
+    expect(statusEqualizer.findAll('i')).toHaveLength(7)
 
     wrapper.unmount()
   })

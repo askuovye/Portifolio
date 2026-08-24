@@ -5,7 +5,7 @@ import RetroWindow from '@/components/ui/RetroWindow.vue'
 import profileImage from '@/assets/profile-joao.jpeg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
 
 interface CaptchaImage {
   src: string

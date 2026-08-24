@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useReducedMotion } from 'motion-v'
 import type { Project } from '@/data/projects'
 
-defineProps<{ project: Project }>()
+const props = defineProps<{ project: Project; isPlaying: boolean }>()
 
 const cover = ref<HTMLElement | null>(null)
+const image = ref<HTMLImageElement | null>(null)
+const pausedFrame = ref<HTMLCanvasElement | null>(null)
+const hasPausedFrame = ref(false)
 const prefersReducedMotion = useReducedMotion()
 
 const moveCover = (event: PointerEvent) => {
@@ -22,6 +25,30 @@ const resetCover = () => {
   cover.value?.style.removeProperty('--cover-rotate-x')
   cover.value?.style.removeProperty('--cover-rotate-y')
 }
+
+const capturePausedFrame = async () => {
+  await nextTick()
+  const source = image.value
+  const canvas = pausedFrame.value
+  if (!source || !canvas || !source.complete || !source.naturalWidth) return
+
+  canvas.width = source.naturalWidth
+  canvas.height = source.naturalHeight
+  const context = canvas.getContext('2d')
+  if (!context) return
+  context.drawImage(source, 0, 0, canvas.width, canvas.height)
+  hasPausedFrame.value = true
+}
+
+watch(() => props.isPlaying, (playing) => {
+  if (playing) hasPausedFrame.value = false
+  else void capturePausedFrame()
+}, { immediate: true })
+
+watch(() => props.project.id, () => {
+  hasPausedFrame.value = false
+  if (!props.isPlaying) void capturePausedFrame()
+})
 </script>
 
 <template>
@@ -31,24 +58,21 @@ const resetCover = () => {
       <span>DEV.MP3 / {{ project.year }}</span>
     </header>
 
-    <div
-      ref="cover"
-      class="now-playing__cover"
-      @pointermove="moveCover"
-      @pointerleave="resetCover"
-    >
+    <div class="now-playing__scroll">
+      <div ref="cover" class="now-playing__cover" @pointermove="moveCover" @pointerleave="resetCover">
       <div class="now-playing__cover-bar" aria-hidden="true">
         <span>{{ project.id }}.exe</span>
         <span>— □ ×</span>
       </div>
       <div class="now-playing__image-wrap">
-        <img :src="project.image" :alt="`Captura de tela do projeto ${project.title}`">
+        <img ref="image" :src="project.image" :alt="`Captura de tela do projeto ${project.title}`" @load="!isPlaying && capturePausedFrame()">
+        <canvas ref="pausedFrame" class="now-playing__paused-frame" :class="{ 'now-playing__paused-frame--visible': hasPausedFrame }" aria-hidden="true" />
         <span class="now-playing__scanlines" aria-hidden="true" />
         <span class="now-playing__reflection" aria-hidden="true" />
       </div>
-    </div>
+      </div>
 
-    <div class="now-playing__details">
+      <div class="now-playing__details">
       <p class="now-playing__meta">TRACK {{ String(project.track).padStart(2, '0') }} · {{ project.category }}</p>
       <h3>{{ project.title }}</h3>
       <p class="now-playing__subtitle">{{ project.subtitle }}</p>
@@ -71,13 +95,18 @@ const resetCover = () => {
           Source code
         </a>
       </div>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped lang="scss">
 .now-playing {
+  display: flex;
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  flex-direction: column;
   padding: .75rem;
   border: 1px solid #4c4c4c;
   background:
@@ -86,6 +115,14 @@ const resetCover = () => {
     #080808;
   background-size: 22px 22px;
   box-shadow: inset 1px 1px #e7e7e7, inset -1px -1px #333;
+}
+
+.now-playing__scroll {
+  min-height: 0;
+  padding: .1rem .2rem .5rem;
+  overflow-y: auto;
+  scrollbar-color: var(--accent) #111;
+  scrollbar-width: thin;
 }
 
 .now-playing__header {
@@ -142,6 +179,9 @@ const resetCover = () => {
   object-fit: cover;
   object-position: center;
 }
+
+.now-playing__paused-frame { position: absolute; inset: 0; z-index: 1; display: none; width: 100%; height: 100%; object-fit: cover; }
+.now-playing__paused-frame--visible { display: block; }
 
 .now-playing__scanlines,
 .now-playing__reflection { position: absolute; inset: 0; pointer-events: none; }

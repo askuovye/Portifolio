@@ -7,7 +7,7 @@ import tamagochiVideo from '@/assets/animations/tamagochi.mp4'
 import globeImage from '@/assets/elements/globe.jpg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
 const tamagochiPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
 let tamagochiObserver: IntersectionObserver | undefined

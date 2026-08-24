@@ -5,7 +5,7 @@ import { useEnterMotion } from '@/composables/useEnterMotion'
 import hdVideo from '@/assets/animations/hd.mp4'
 import windowsImage from '@/assets/elements/windows.png'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
 const section = ref<HTMLElement | null>(null)
 const hdPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)

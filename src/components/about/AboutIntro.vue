@@ -9,7 +9,7 @@ import legoSkeletonImage from '@/assets/elements/lego-skeleton.png'
 import profileImage from '@/assets/profile-joao.jpeg'
 import chatbotImage from '@/assets/elements/chatbot.jpeg'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
 const captchaImages = [
   { src: profileImage, position: 'center 12%' },
   { src: chatbotImage, position: 'center 32%' },
@@ -70,7 +70,7 @@ onBeforeUnmount(() => {
   <section ref="section" class="about-intro" aria-labelledby="about-title">
     <div class="about-intro__copy">
       <motion.p class="about-intro__eyebrow" v-bind="enter(0.05)">// ABOUT_ME.TXT</motion.p>
-      <motion.h1 id="about-title" v-bind="enter(0.12)">João<br><span>Fortes</span></motion.h1>
+      <motion.h1 id="about-title" v-bind="enter(0.38)">João<br><span>Fortes</span></motion.h1>
       <motion.p class="about-intro__role" v-bind="enter(0.2)">Desenvolvedor Full Stack — Laravel & Vue.js</motion.p>
       <motion.p class="about-intro__description" v-bind="enter(0.28)">Construindo do banco de dados à interface. Graduando em Engenharia de Software em Guarapuava, PR.</motion.p>
     </div>
@@ -140,10 +140,10 @@ onBeforeUnmount(() => {
 .about-intro__chains {
   position: absolute;
   z-index: 1;
-  top: clamp(2rem, -7vw, -3.5rem);
-  right: clamp(-16rem, -12vw, -5rem);
-  width: clamp(24rem, 43vw, 46rem);
-  height: clamp(8rem, 16vw, 15rem);
+  top: clamp(3rem, -7vw, -3.5rem);
+  right: clamp(-20rem, -16vw, -8rem);
+  width: clamp(50rem, 50vw, 50rem);
+  height: clamp(12rem, 16vw, 15rem);
   overflow: hidden;
   transform: rotate(40deg);
   transform-origin: center;
