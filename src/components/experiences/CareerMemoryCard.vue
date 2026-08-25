@@ -172,6 +172,7 @@ onBeforeUnmount(() => {
 
 .memory-card__body {
   z-index: 1;
+  clip-path: inset(3% 0 0);
   filter: drop-shadow(6px 10px 4px rgb(0 0 0 / 68%)) drop-shadow(18px 23px 16px rgb(0 0 0 / 42%));
   transform: translateZ(0);
 }
