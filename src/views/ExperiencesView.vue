@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import CertificationsSection from '@/components/experiences/CertificationsSection.vue'
+import CareerExperience from '@/components/experiences/CareerExperience.vue'
 import EducationSection from '@/components/experiences/EducationSection.vue'
 import ExperienceHero from '@/components/experiences/ExperienceHero.vue'
-import ExperienceTimeline from '@/components/experiences/ExperienceTimeline.vue'
 </script>
 
 <template>
-  <div class="experience-page">
+  <div>
     <ExperienceHero />
     <div class="experience-page__content">
-      <ExperienceTimeline />
+      <CareerExperience />
       <div class="experience-page__details">
         <EducationSection />
         <CertificationsSection />
@@ -19,9 +19,6 @@ import ExperienceTimeline from '@/components/experiences/ExperienceTimeline.vue'
 </template>
 
 <style scoped lang="scss">
-.experience-page {
-  border-inline: 1px solid var(--border);
-}
 
 .experience-page__content {
   padding: clamp(3rem, 7vw, 7rem) clamp(1rem, 4vw, 4rem);
@@ -32,8 +29,6 @@ import ExperienceTimeline from '@/components/experiences/ExperienceTimeline.vue'
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1px;
   margin-top: clamp(4rem, 8vw, 8rem);
-  border: 1px solid var(--border);
-  background: var(--border);
 }
 
 @media (max-width: 48rem) {
