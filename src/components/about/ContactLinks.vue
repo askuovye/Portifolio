@@ -4,16 +4,21 @@ import { Icon } from '@iconify/vue'
 import { motion } from 'motion-v'
 import { RouterLink } from 'vue-router'
 import tamagochiVideo from '@/assets/animations/tamagochi.mp4'
+import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
 import globeImage from '@/assets/elements/globe.jpg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
-const { enter } = useEnterMotion()
+const { enter } = useEnterMotion(.7)
+const section = ref<HTMLElement | null>(null)
 const tamagochiPlayer = ref<HTMLVideoElement | null>(null)
+const chainsPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
 let tamagochiObserver: IntersectionObserver | undefined
+let chainsObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
 
 const pauseTamagochi = () => tamagochiPlayer.value?.pause()
+const pauseChains = () => chainsPlayer.value?.pause()
 
 const observeTamagochi = async () => {
   tamagochiObserver?.disconnect()
@@ -32,11 +37,31 @@ const observeTamagochi = async () => {
   tamagochiObserver.observe(tamagochiPlayer.value)
 }
 
+const observeChains = async () => {
+  chainsObserver?.disconnect()
+  pauseChains()
+  if (!isDesktop.value) return
+
+  await nextTick()
+  if (!section.value || !chainsPlayer.value) return
+
+  chainsObserver = new IntersectionObserver(([entry]) => {
+    if (!entry) return
+    if (entry.isIntersecting) void chainsPlayer.value?.play().catch(() => undefined)
+    else pauseChains()
+  }, { threshold: 0.08 })
+
+  chainsObserver.observe(section.value)
+}
+
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
 
-watch(isDesktop, () => { void observeTamagochi() })
+watch(isDesktop, () => {
+  void observeTamagochi()
+  void observeChains()
+})
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -47,8 +72,10 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   tamagochiObserver?.disconnect()
+  chainsObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
   pauseTamagochi()
+  pauseChains()
 })
 
 interface ContactLink {
@@ -75,74 +102,93 @@ const links: ContactLink[] = [
   },
   {
     label: 'Email',
-    detail: 'Mensagem direta',
+    detail: 'john.lopes.fortes@gmail.com',
     icon: 'mdi:email-outline',
-    to: '/contact',
+    href: 'mailto:john.lopes.fortes@gmail.com',
   },
   {
     label: 'WhatsApp',
-    detail: 'Conversa rápida',
+    detail: '42984431307',
     icon: 'mdi:whatsapp',
-    to: '/contact',
+    href: 'https://wa.me/+5542984431307',
   },
   {
     label: 'Currículo',
-    detail: 'Disponível em breve',
+    detail: 'Baixar PDF',
     icon: 'mdi:file-document-outline',
-    available: false,
+    href: '/resume/joao-fortes-pt-BR.pdf',
   },
 ]
 </script>
 
 <template>
-  <section class="contact-links" aria-labelledby="contact-links-title">
-    <div class="contact-links__heading">
-      <motion.p v-bind="enter(0.05)">// CONTACT_DIRECTORY</motion.p>
-      <motion.h2 id="contact-links-title" v-bind="enter(0.12)">Onde me<br><span>achar?</span></motion.h2>
-      <motion.p class="contact-links__intro" v-bind="enter(0.2)">Aberto a projetos, colaborações e boas conversas sobre tecnologia.</motion.p>
+  <section ref="section" class="contact-links-shell" aria-labelledby="contact-links-title">
+    <div v-if="isDesktop" class="contact-links__chains" aria-hidden="true">
+      <video
+        ref="chainsPlayer"
+        :src="chainsHorizontalVideo"
+        muted
+        loop
+        playsinline
+        preload="metadata"
+      />
     </div>
 
-    <ol class="contact-links__list">
-      <motion.li v-for="(link, index) in links" :key="link.label" v-bind="enter(0.08 + index * 0.06)">
-        <component
-          :is="link.available === false ? 'div' : (link.to ? RouterLink : 'a')"
-          class="contact-link"
-          :class="{ 'contact-link--disabled': link.available === false }"
-          :to="link.to"
-          :href="link.href"
-          :target="link.href ? '_blank' : undefined"
-          :rel="link.href ? 'noopener noreferrer' : undefined"
-          :aria-disabled="link.available === false || undefined"
-        >
-          <span class="contact-link__number">{{ String(index + 1).padStart(2, '0') }}</span>
-          <span class="contact-link__icon" aria-hidden="true"><Icon :icon="link.icon" /></span>
-          <span class="contact-link__copy">
-            <strong>{{ link.label }}</strong>
-            <small>{{ link.detail }}</small>
-          </span>
-          <span class="contact-link__arrow" aria-hidden="true">{{ link.available === false ? '—' : '↗' }}</span>
-        </component>
-      </motion.li>
-    </ol>
+    <div class="contact-links">
+      <div class="contact-links__heading">
+        <motion.p v-bind="enter(0.05)">// CONTACT_DIRECTORY</motion.p>
+        <motion.h2 id="contact-links-title" v-bind="enter(0.12)">Onde me<br><span>achar?</span></motion.h2>
+        <motion.p class="contact-links__intro" v-bind="enter(0.2)">Aberto a projetos, colaborações e boas conversas sobre tecnologia.</motion.p>
+      </div>
 
-    <img class="contact-links__globe" :src="globeImage" alt="" aria-hidden="true">
-    <video
-      v-if="isDesktop"
-      ref="tamagochiPlayer"
-      class="contact-links__tamagochi"
-      :src="tamagochiVideo"
-      muted
-      loop
-      playsinline
-      preload="metadata"
-      aria-hidden="true"
-    />
+      <ol class="contact-links__list">
+        <motion.li v-for="(link, index) in links" :key="link.label" v-bind="enter(0.08 + index * 0.06)">
+          <component
+            :is="link.available === false ? 'div' : (link.to ? RouterLink : 'a')"
+            class="contact-link"
+            :class="{ 'contact-link--disabled': link.available === false }"
+            :to="link.to"
+            :href="link.href"
+            :target="link.href ? '_blank' : undefined"
+            :rel="link.href ? 'noopener noreferrer' : undefined"
+            :aria-disabled="link.available === false || undefined"
+          >
+            <span class="contact-link__number">{{ String(index + 1).padStart(2, '0') }}</span>
+            <span class="contact-link__icon" aria-hidden="true"><Icon :icon="link.icon" /></span>
+            <span class="contact-link__copy">
+              <strong>{{ link.label }}</strong>
+              <small>{{ link.detail }}</small>
+            </span>
+            <span class="contact-link__arrow" aria-hidden="true">{{ link.available === false ? '—' : '↗' }}</span>
+          </component>
+        </motion.li>
+      </ol>
+
+      <img class="contact-links__globe" :src="globeImage" alt="" aria-hidden="true">
+      <video
+        v-if="isDesktop"
+        ref="tamagochiPlayer"
+        class="contact-links__tamagochi"
+        :src="tamagochiVideo"
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      />
+    </div>
   </section>
 </template>
 
 <style scoped lang="scss">
+.contact-links-shell {
+  position: relative;
+  overflow: visible;
+}
+
 .contact-links {
   position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: minmax(17rem, .8fr) minmax(22rem, 1.2fr);
   gap: clamp(3rem, 9vw, 9rem);
@@ -154,6 +200,27 @@ const links: ContactLink[] = [
 
 .contact-links__heading,
 .contact-links__list { position: relative; z-index: 1; }
+
+.contact-links__chains {
+  position: absolute;
+  z-index: 0;
+  top: 70%;
+  left: clamp(-36rem, -27vw, -14rem);
+  width: clamp(44rem, 52vw, 54rem);
+  height: clamp(15rem, 17vw, 17rem);
+  overflow: hidden;
+  transform: translateY(-50%) rotate(54deg);
+  transform-origin: center;
+  pointer-events: none;
+}
+
+.contact-links__chains video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
 
 .contact-links__globe {
   position: absolute;

@@ -129,15 +129,15 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
           </div>
         </RetroWindow>
       </div>
-      <motion.img class="portrait-badge" :src="heroBadge" alt="Fullstack developer" v-bind="enter(0.68, { scale: 0.92, rotate: -5 })" />
+      <motion.img class="portrait-badge" :src="heroBadge" alt="Fullstack developer"/>
       <motion.img class="portrait-cursor" :src="cursorImage" alt="" aria-hidden="true" v-bind="enter(0.76, { y: 8, rotate: -7 })" />
     </div>
-    <motion.img class="devmode-badge deco" :src="devmodeBadge" alt="Dev mode — sistemas online" v-bind="enter(0.72, { x: -8 })" />
+    <motion.img class="devmode-badge deco" :src="devmodeBadge" alt="Dev mode — sistemas online"/>
     <motion.aside class="coordinates deco" aria-label="Localização" v-bind="enter(0.78)">
       <span class="coordinates__globe"><Icon class="retro-window__close-icon" icon="iconoir:www" /></span><span>−23.5505° S<br>−46.6333° W</span><strong>BRASIL</strong>
     </motion.aside>
-    <motion.div class="vertical-note deco" v-bind="enter(0.82)">DESIGN + CODE + CREATE</motion.div>
-    <motion.img class="barcode" :src="barCode" alt="one of a kind" v-bind="enter(0.68)" />
+    <motion.div class="vertical-note deco">DESIGN + CODE + CREATE</motion.div>
+    <motion.img class="barcode" :src="barCode" alt="one of a kind"/>
     <motion.div class="disposable deco" v-bind="enter(0.9)"><Icon class="disposable__icon" icon="mdi:recycle" aria-hidden="true" /><span>NON-DISPOSABLE</span></motion.div>
     <div v-if="isDesktop && !prefersReducedMotion" ref="chains" class="hero__chains" aria-hidden="true">
       <video

@@ -155,6 +155,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
 
 .site-shell {
   min-height: 100dvh;
+  overflow: clip;
 }
 
 .site-header {
@@ -223,11 +224,14 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
 }
 
 .site-footer {
+  position: relative;
+  z-index: 1;
   display: flex;
   justify-content: space-between;
   margin-top: 4rem;
   padding-block: 1.25rem;
   border-top: 1px solid var(--border);
+  background: var(--background);
   color: var(--text-secondary);
   font-family: var(--font-mono);
   font-size: 0.68rem;
