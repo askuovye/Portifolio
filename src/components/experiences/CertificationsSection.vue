@@ -16,7 +16,7 @@ const certifications = [
       <li v-for="(certification, index) in certifications" :key="certification.title">
         <span>{{ String(index + 1).padStart(2, '0') }}</span>
         <div>
-          <h3>{{ certification.title }}</h3>
+          <h4>{{ certification.title }}</h4>
           <p>{{ certification.issuer }}</p>
         </div>
         <span aria-hidden="true">↗</span>

@@ -5,27 +5,17 @@ import { motion, useReducedMotion } from 'motion-v'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
-import projectPlaceholder from '@/assets/elements/placeholder.png'
-import kinect from '@/assets/animations/kinect-galery.gif'
-import ecolink from '@/assets/animations/ecolink.gif'
-import vestock from '@/assets/elements/vestock.png'
-import chatbot from '@/assets/elements/chatbot.jpeg'
 import { gsap } from '@/animations/gsap'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
 import { useGsapContext } from '@/composables/useGsapContext'
+import { projects } from '@/data/projects'
 
-interface ProjectSummary {
-  name: string
-  image: string
-  technologies: string[]
-}
-
-const projects: ProjectSummary[] = [
-  { name: 'Vestock', image: vestock, technologies: ['Vue.js', 'Laravel', 'Postgre'] },
-  { name: 'Ecolink', image: ecolink, technologies: ['Laravel', 'Flutter', 'MySQL'] },
-  { name: 'Chatbot Langchain', image: chatbot, technologies: ['Python', 'LangChain', 'GrokAPI'] },
-  { name: 'Kinect Galery', image: kinect, technologies: ['Vue.js', 'SCSS', 'JS'] },
-]
+const projectSummaries = projects.map(project => ({
+  id: project.id,
+  name: project.title,
+  image: project.image,
+  technologies: project.technologies,
+}))
 
 const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
@@ -77,8 +67,8 @@ useGsapContext(section, ({ reducedMotion }) => {
 
     <div class="projects-section__grid">
       <article
-        v-for="(project, index) in projects"
-        :key="project.name"
+        v-for="(project, index) in projectSummaries"
+        :key="project.id"
         class="project-summary"
       >
         <h3 class="project-summary__accessible-title">{{ project.name }}</h3>

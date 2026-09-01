@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import TypedText from '@/components/ui/TypedText.vue'
+
+const section = ref<HTMLElement | null>(null)
+
+defineExpose({
+  getRevealElement: () => section.value ?? undefined,
+})
 </script>
 
 <template>
-  <section aria-labelledby="work-summary-title">
+  <section ref="section" aria-labelledby="work-summary-title">
     <RetroWindow class="work-summary" title="work_summary.sh" close-label="Janela decorativa sobre meu trabalho">
       <div class="terminal">
         <div class="terminal__toolbar" aria-hidden="true">

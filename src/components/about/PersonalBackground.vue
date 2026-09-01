@@ -1,10 +1,17 @@
 <script setup lang="ts">
+import { ref } from 'vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import TypedText from '@/components/ui/TypedText.vue'
+
+const section = ref<HTMLElement | null>(null)
+
+defineExpose({
+  getRevealElement: () => section.value ?? undefined,
+})
 </script>
 
 <template>
-  <section aria-labelledby="personal-background-title">
+  <section ref="section" aria-labelledby="personal-background-title">
     <RetroWindow class="personal-background" title="background.log" close-label="Janela decorativa sobre minha trajetória">
       <div class="terminal">
         <div class="terminal__toolbar" aria-hidden="true">
