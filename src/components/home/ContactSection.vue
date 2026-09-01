@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
@@ -8,6 +8,7 @@ import SectionTitle from '@/components/ui/SectionTitle.vue'
 import { gsap } from '@/animations/gsap'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
 import { useGsapContext } from '@/composables/useGsapContext'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import worldVideo from '@/assets/animations/world.mp4'
 
 interface ContactChannel {
@@ -30,33 +31,12 @@ const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
 const worldPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
-let worldObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
-
-const pauseWorld = () => worldPlayer.value?.pause()
-
-const observeWorld = async () => {
-  worldObserver?.disconnect()
-  pauseWorld()
-  if (!isDesktop.value) return
-
-  await nextTick()
-  if (!section.value || !worldPlayer.value) return
-
-  worldObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void worldPlayer.value?.play().catch(() => undefined)
-    else pauseWorld()
-  }, { threshold: 0.08 })
-
-  worldObserver.observe(section.value)
-}
+useDecorativeVideo(worldPlayer, { target: section, enabled: isDesktop, threshold: .08 })
 
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
-
-watch(isDesktop, () => { void observeWorld() })
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -66,9 +46,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  worldObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
-  pauseWorld()
 })
 
 useGsapContext(section, ({ reducedMotion }) => {

@@ -9,25 +9,33 @@ import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
 
 const page = ref<HTMLElement | null>(null)
+const aboutIntro = ref<InstanceType<typeof AboutIntro> | null>(null)
+const workSummary = ref<InstanceType<typeof WorkSummary> | null>(null)
+const personalBackground = ref<InstanceType<typeof PersonalBackground> | null>(null)
 
 useGsapContext(page, ({ reducedMotion }) => {
-  const windows = page.value?.querySelectorAll<HTMLElement>('.retro-window')
-  if (!windows?.length) return
+  const windows = [
+    { element: aboutIntro.value?.getRevealElement(), delay: 0.75 },
+    { element: workSummary.value?.getRevealElement(), delay: 0 },
+    { element: personalBackground.value?.getRevealElement(), delay: 0 },
+  ].filter((window): window is { element: HTMLElement; delay: number } => Boolean(window.element))
+
+  if (!windows.length) return
 
   if (reducedMotion) {
-    gsap.set(windows, { clearProps: 'clipPath' })
+    gsap.set(windows.map(({ element }) => element), { clearProps: 'clipPath' })
     return
   }
 
-  windows.forEach((window) => {
-    gsap.from(window, {
+  windows.forEach(({ element, delay }) => {
+    gsap.from(element, {
       clipPath: 'inset(0 0 100% 0)',
       duration: 0.8,
       ease: 'power3.inOut',
       clearProps: 'clipPath',
-      delay: window.classList.contains('captcha') ? 0.75 : 0,
+      delay,
       scrollTrigger: {
-        trigger: window,
+        trigger: element,
         start: 'top 88%',
         once: true,
       },
@@ -38,11 +46,11 @@ useGsapContext(page, ({ reducedMotion }) => {
 
 <template>
   <div ref="page" class="about-content">
-    <AboutIntro />
+    <AboutIntro ref="aboutIntro" />
     <TechnicalIdentity />
     <div class="about-story-grid">
-      <WorkSummary />
-      <PersonalBackground />
+      <WorkSummary ref="workSummary" class="about-story-grid__work-summary" />
+      <PersonalBackground ref="personalBackground" class="about-story-grid__personal-background" />
     </div>
     <ContactLinks />
   </div>
@@ -62,11 +70,11 @@ useGsapContext(page, ({ reducedMotion }) => {
   background-size: 28px 28px;
 }
 
-.about-story-grid :deep(.work-summary) { transform: rotate(-1deg); }
-.about-story-grid :deep(.personal-background) { margin-top: clamp(2rem, 5vw, 4.5rem); transform: rotate(1deg); }
+.about-story-grid__work-summary { transform: rotate(-1deg); }
+.about-story-grid__personal-background { margin-top: clamp(2rem, 5vw, 4.5rem); transform: rotate(1deg); }
 
 @media (max-width: 48rem) {
   .about-story-grid { grid-template-columns: 1fr; }
-  .about-story-grid :deep(.personal-background) { margin-top: 0; }
+  .about-story-grid__personal-background { margin-top: 0; }
 }
 </style>

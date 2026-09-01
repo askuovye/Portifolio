@@ -5,10 +5,10 @@
       <h2 id="education-title">Formação acadêmica</h2>
     </header>
     <div class="education__entry">
-      <div class="education__year">2024<br>— 2028</div>
+      <div class="education__year">2024<br>2028</div>
       <div>
         <p>GRADUAÇÃO • EM ANDAMENTO</p>
-        <h3>Bacharelado em<br>Engenharia de Software</h3>
+        <h4>Bacharelado em<br>Engenharia de Software</h4>
         <span>Centro Universitário UniGuairacá</span>
       </div>
     </div>

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CareerExperience } from '@/data/experiences'
+import barbedWireImage from '@/assets/elements/barbedwire.png'
 
 defineProps<{
   experience: CareerExperience
@@ -8,36 +9,56 @@ defineProps<{
 </script>
 
 <template>
-  <section class="save-data" :class="{ 'save-data--reading': reading }" aria-labelledby="save-data-title" aria-live="polite">
-    <header class="save-data__bar">
-      <span id="save-data-title">// CAREER SAVE DATA</span>
-      <span>{{ reading ? 'READING...' : experience.saveFile }}</span>
-    </header>
-    <div v-if="reading" class="save-data__reading">
-      <span>READING CAREER DATA</span><i aria-hidden="true" />
-    </div>
-    <div v-else class="save-data__body">
-      <dl class="save-data__facts">
-        <div><dt>ROLE</dt><dd>{{ experience.role }}</dd></div>
-        <div><dt>PERIOD</dt><dd>{{ experience.period }}</dd></div>
-        <div><dt>STATUS</dt><dd :class="{ 'is-active': experience.status === 'active' }">{{ experience.status.toUpperCase() }}</dd></div>
-      </dl>
-      <div class="save-data__description">
-        <span>DESCRIPTION.LOG</span>
-        <ul>
-          <li v-for="activity in experience.activities" :key="activity">{{ activity }}</li>
-        </ul>
+  <div class="save-data-shell">
+    <img class="save-data__barbed-wire" :src="barbedWireImage" alt="" aria-hidden="true">
+    <section class="save-data" :class="{ 'save-data--reading': reading }" aria-labelledby="save-data-title" aria-live="polite">
+      <header class="save-data__bar">
+        <span id="save-data-title">// CAREER SAVE DATA</span>
+        <span>{{ reading ? 'READING...' : experience.saveFile }}</span>
+      </header>
+      <div v-if="reading" class="save-data__reading">
+        <span>READING CAREER DATA</span><i aria-hidden="true" />
       </div>
-      <footer>
-        <span>SKILLS ACQUIRED</span>
-        <strong>{{ String(experience.skills.length).padStart(2, '0') }}</strong>
-      </footer>
-    </div>
-  </section>
+      <div v-else class="save-data__body">
+        <dl class="save-data__facts">
+          <div><dt>ROLE</dt><dd>{{ experience.role }}</dd></div>
+          <div><dt>PERIOD</dt><dd>{{ experience.period }}</dd></div>
+          <div><dt>STATUS</dt><dd :class="{ 'is-active': experience.status === 'active' }">{{ experience.status.toUpperCase() }}</dd></div>
+        </dl>
+        <div class="save-data__description">
+          <span>DESCRIPTION.LOG</span>
+          <ul>
+            <li v-for="activity in experience.activities" :key="activity">{{ activity }}</li>
+          </ul>
+        </div>
+        <footer>
+          <span>SKILLS ACQUIRED</span>
+          <strong>{{ String(experience.skills.length).padStart(2, '0') }}</strong>
+        </footer>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped lang="scss">
+.save-data-shell { position: relative; min-width: 0; }
+.save-data__barbed-wire {
+  position: absolute;
+  z-index: 0;
+  top: -8%;
+  bottom: -8%;
+  left: -72%;
+  width: 112%;
+  height: 116%;
+  object-fit: cover;
+  object-position: center;
+  opacity: .62;
+  filter: contrast(1.12) brightness(.72);
+  pointer-events: none;
+  user-select: none;
+}
 .save-data { min-height: 31rem; border: 1px solid #777; background: #050605; box-shadow: 7px 8px 0 rgb(23 60 255 / 15%); }
+.save-data { position: relative; z-index: 1; }
 .save-data__bar { display: flex; justify-content: space-between; gap: 1rem; padding: .55rem .75rem; background: var(--accent); color: white; font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
 .save-data__body { padding: clamp(1.2rem, 3vw, 2rem); animation: save-data-in .36s steps(4); }
 .save-data__facts { display: grid; gap: .75rem; margin: 0; }
@@ -60,5 +81,9 @@ defineProps<{
 
 @media (prefers-reduced-motion: reduce) {
   .save-data__body, .save-data__reading i { animation: none; }
+}
+
+@media (max-width: 64rem) {
+  .save-data__barbed-wire { left: -32%; width: 70%; opacity: .46; }
 }
 </style>

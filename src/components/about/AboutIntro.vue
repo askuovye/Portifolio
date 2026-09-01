@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { motion } from 'motion-v'
 import FakeCaptcha from './FakeCaptcha.vue'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
 import doubleGlobeImage from '@/assets/elements/double-globe.jpg'
 import legoSkeletonImage from '@/assets/elements/lego-skeleton.png'
@@ -22,35 +23,19 @@ const captchaImages = [
   { src: profileImage, position: 'right 68%' },
 ]
 const section = ref<HTMLElement | null>(null)
+const captcha = ref<InstanceType<typeof FakeCaptcha> | null>(null)
 const chainsPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
-let chainsObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
+useDecorativeVideo(chainsPlayer, { target: section, enabled: isDesktop, threshold: .08 })
 
-const pauseChains = () => chainsPlayer.value?.pause()
-
-const observeChains = async () => {
-  chainsObserver?.disconnect()
-  pauseChains()
-  if (!isDesktop.value) return
-
-  await nextTick()
-  if (!section.value || !chainsPlayer.value) return
-
-  chainsObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void chainsPlayer.value?.play().catch(() => undefined)
-    else pauseChains()
-  }, { threshold: 0.08 })
-
-  chainsObserver.observe(section.value)
-}
+defineExpose({
+  getRevealElement: () => captcha.value?.$el as HTMLElement | undefined,
+})
 
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
-
-watch(isDesktop, () => { void observeChains() })
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -60,9 +45,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  chainsObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
-  pauseChains()
 })
 </script>
 
@@ -74,7 +57,7 @@ onBeforeUnmount(() => {
       <motion.p class="about-intro__role" v-bind="enter(0.2)">Desenvolvedor Full Stack — Laravel & Vue.js</motion.p>
       <motion.p class="about-intro__description" v-bind="enter(0.28)">Construindo do banco de dados à interface. Graduando em Engenharia de Software em Guarapuava, PR.</motion.p>
     </div>
-    <FakeCaptcha class="captcha" :images="captchaImages" />
+    <FakeCaptcha ref="captcha" class="captcha" :images="captchaImages" />
     <img class="about-intro__double-globe" :src="doubleGlobeImage" alt="" aria-hidden="true">
     <img class="about-intro__lego-skeleton" :src="legoSkeletonImage" alt="" aria-hidden="true">
     <div v-if="isDesktop" class="about-intro__chains" aria-hidden="true">

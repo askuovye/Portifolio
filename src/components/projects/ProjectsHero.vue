@@ -1,31 +1,14 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { ref } from 'vue'
 import { motion } from 'motion-v'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import computerVideo from '@/assets/animations/computer.mp4'
 
 const { enter } = useEnterMotion(.7)
 const section = ref<HTMLElement | null>(null)
 const computerPlayer = ref<HTMLVideoElement | null>(null)
-let computerObserver: IntersectionObserver | undefined
-
-const pauseComputer = () => computerPlayer.value?.pause()
-
-onMounted(() => {
-  if (!section.value || !computerPlayer.value || typeof window.IntersectionObserver !== 'function') return
-
-  computerObserver = new IntersectionObserver(([entry]) => {
-    if (entry?.isIntersecting) void computerPlayer.value?.play().catch(() => undefined)
-    else pauseComputer()
-  }, { threshold: .08 })
-
-  computerObserver.observe(section.value)
-})
-
-onBeforeUnmount(() => {
-  computerObserver?.disconnect()
-  pauseComputer()
-})
+useDecorativeVideo(computerPlayer, { target: section, threshold: .08 })
 </script>
 
 <template>

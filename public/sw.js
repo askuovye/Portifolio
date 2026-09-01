@@ -17,12 +17,7 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url)
   if (url.origin !== self.location.origin) return
 
-  if (request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).catch(() => caches.match(request).then((response) => response || Response.error())),
-    )
-    return
-  }
+  if (request.mode === 'navigate') return
 
   if (!CACHEABLE_DESTINATIONS.has(request.destination)) return
 

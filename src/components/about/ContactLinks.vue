@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion } from 'motion-v'
 import { RouterLink } from 'vue-router'
@@ -7,61 +7,20 @@ import tamagochiVideo from '@/assets/animations/tamagochi.mp4'
 import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
 import globeImage from '@/assets/elements/globe.jpg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const { enter } = useEnterMotion(.7)
 const section = ref<HTMLElement | null>(null)
 const tamagochiPlayer = ref<HTMLVideoElement | null>(null)
 const chainsPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
-let tamagochiObserver: IntersectionObserver | undefined
-let chainsObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
-
-const pauseTamagochi = () => tamagochiPlayer.value?.pause()
-const pauseChains = () => chainsPlayer.value?.pause()
-
-const observeTamagochi = async () => {
-  tamagochiObserver?.disconnect()
-  pauseTamagochi()
-  if (!isDesktop.value) return
-
-  await nextTick()
-  if (!tamagochiPlayer.value) return
-
-  tamagochiObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void tamagochiPlayer.value?.play().catch(() => undefined)
-    else pauseTamagochi()
-  }, { threshold: 0.15 })
-
-  tamagochiObserver.observe(tamagochiPlayer.value)
-}
-
-const observeChains = async () => {
-  chainsObserver?.disconnect()
-  pauseChains()
-  if (!isDesktop.value) return
-
-  await nextTick()
-  if (!section.value || !chainsPlayer.value) return
-
-  chainsObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void chainsPlayer.value?.play().catch(() => undefined)
-    else pauseChains()
-  }, { threshold: 0.08 })
-
-  chainsObserver.observe(section.value)
-}
+useDecorativeVideo(tamagochiPlayer, { enabled: isDesktop, threshold: .15 })
+useDecorativeVideo(chainsPlayer, { target: section, enabled: isDesktop, threshold: .08 })
 
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
-
-watch(isDesktop, () => {
-  void observeTamagochi()
-  void observeChains()
-})
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -71,11 +30,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  tamagochiObserver?.disconnect()
-  chainsObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
-  pauseTamagochi()
-  pauseChains()
 })
 
 interface ContactLink {

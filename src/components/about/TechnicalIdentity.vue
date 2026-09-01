@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { motion } from 'motion-v'
 import { useEnterMotion } from '@/composables/useEnterMotion'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import hdVideo from '@/assets/animations/hd.mp4'
 import windowsImage from '@/assets/elements/windows.png'
 
@@ -9,33 +10,12 @@ const { enter } = useEnterMotion(.7)
 const section = ref<HTMLElement | null>(null)
 const hdPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
-let hdObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
-
-const pauseHd = () => hdPlayer.value?.pause()
-
-const observeHd = async () => {
-  hdObserver?.disconnect()
-  pauseHd()
-  if (!isDesktop.value) return
-
-  await nextTick()
-  if (!section.value || !hdPlayer.value) return
-
-  hdObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void hdPlayer.value?.play().catch(() => undefined)
-    else pauseHd()
-  }, { threshold: 0.08 })
-
-  hdObserver.observe(section.value)
-}
+useDecorativeVideo(hdPlayer, { target: section, enabled: isDesktop, threshold: .08 })
 
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
-
-watch(isDesktop, () => { void observeHd() })
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -45,9 +25,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  hdObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
-  pauseHd()
 })
 </script>
 

@@ -7,8 +7,11 @@ import ScrollVideo from '@/components/ui/ScrollVideo.vue'
 import nokiaVideo from '@/assets/animations/nokia.mp4'
 import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
+import { careerSkillNodes } from '@/data/careerSkills'
+import { careerExperiences } from '@/data/experiences'
 
 interface ExperienceSummary {
+  id: string
   period: string
   role: string
   company: string
@@ -17,37 +20,26 @@ interface ExperienceSummary {
   current?: boolean
 }
 
-const experiences: ExperienceSummary[] = [
-  {
-    period: 'Jul. 2026 — Presente',
-    role: 'Estágio Assistente Técnico TI',
-    company: 'BP Tech',
-    description: 'Suporte técnico, manutenção de sistemas e redes, instalação de equipamentos e implementação de chatbot para WhatsApp em Laravel.',
-    technologies: ['Suporte', 'Redes', 'Laravel'],
-    current: true,
-  },
-  {
-    period: 'Dez. 2025 — Jan. 2026',
-    role: 'Desenvolvedor Full Stack Freelancer',
-    company: 'Projeto Aurora Digital',
-    description: 'Painel administrativo completo, API REST e integração entre frontend e backend para uma operação digital.',
-    technologies: ['Laravel', 'Vue.js', 'MySQL'],
-  },
-  {
-    period: 'Ago. 2025 — Set. 2025',
-    role: 'Desenvolvedor Frontend Freelancer',
-    company: 'Nexora Systems',
-    description: 'Interfaces responsivas, componentes reutilizáveis, consumo de APIs REST e organização da arquitetura frontend.',
-    technologies: ['Vue.js', 'REST API', 'SCSS'],
-  },
-  {
-    period: 'Nov. 2023 — Jun. 2024',
-    role: 'Barboy',
-    company: 'Costa Crociere',
-    description: 'Atuação em um ambiente internacional de alta demanda, desenvolvendo comunicação, adaptação e trabalho sob pressão.',
-    technologies: ['Comunicação', 'Equipe', 'Inglês'],
-  },
-]
+const featuredExperienceIds = new Set([
+  'bp-tech',
+  'aurora-digital',
+  'nexora-systems',
+  'costa-crociere',
+])
+
+const skillLabels = new Map(careerSkillNodes.map(skill => [skill.id, skill.label]))
+
+const experiences: ExperienceSummary[] = careerExperiences
+  .filter(experience => featuredExperienceIds.has(experience.id))
+  .map(experience => ({
+    id: experience.id,
+    period: experience.period.replace(' – ', ' — '),
+    role: experience.role,
+    company: experience.company,
+    description: experience.activities[0] ?? '',
+    technologies: experience.skills.map(skill => skillLabels.get(skill) ?? skill),
+    current: experience.status === 'active',
+  }))
 
 const section = ref<HTMLElement | null>(null)
 
@@ -153,7 +145,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 
       <article
         v-for="(experience, index) in experiences"
-        :key="`${experience.company}-${experience.period}`"
+        :key="experience.id"
         class="experience"
         :class="{ 'experience--right': index % 2 !== 0 }"
       >
@@ -183,7 +175,7 @@ useGsapContext(section, ({ reducedMotion }) => {
     </div>
 
     <div class="experiences__footer">
-      <span aria-hidden="true">04 REGISTROS ENCONTRADOS_</span>
+      <span aria-hidden="true">{{ String(experiences.length).padStart(2, '0') }} REGISTROS ENCONTRADOS_</span>
       <RetroButton to="/experiences" arrow>Ver trajetória completa</RetroButton>
     </div>
   </section>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
@@ -13,6 +13,7 @@ import paperImage from '@/assets/elements/paper.png'
 import chainsVideo from '@/assets/animations/chains.mp4'
 import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
+import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const prefersReducedMotion = useReducedMotion()
 const hero = ref<HTMLElement | null>(null)
@@ -21,8 +22,8 @@ const profileImageReveal = ref<HTMLElement | null>(null)
 const chains = ref<HTMLElement | null>(null)
 const chainsPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
-let chainsObserver: IntersectionObserver | undefined
 let desktopMedia: MediaQueryList | undefined
+useDecorativeVideo(chainsPlayer, { target: hero, enabled: isDesktop, threshold: .08 })
 
 useGsapContext(hero, ({ reducedMotion }) => {
   if (!profileWindow.value || !profileImageReveal.value) return
@@ -56,32 +57,9 @@ useGsapContext(hero, ({ reducedMotion }) => {
     }, '<0.08')
 })
 
-const stopChains = () => {
-  chainsPlayer.value?.pause()
-}
-
-const observeChains = async () => {
-  chainsObserver?.disconnect()
-  stopChains()
-  if (!isDesktop.value || prefersReducedMotion.value) return
-
-  await nextTick()
-  if (!hero.value || !chainsPlayer.value) return
-
-  chainsObserver = new IntersectionObserver(([entry]) => {
-    if (!entry) return
-    if (entry.isIntersecting) void chainsPlayer.value?.play().catch(() => undefined)
-    else stopChains()
-  }, { threshold: 0.08 })
-
-  chainsObserver.observe(hero.value)
-}
-
 const updateDesktop = () => {
   isDesktop.value = Boolean(desktopMedia?.matches)
 }
-
-watch([isDesktop, prefersReducedMotion], () => { void observeChains() })
 
 onMounted(() => {
   if (typeof window.matchMedia !== 'function' || typeof window.IntersectionObserver !== 'function') return
@@ -91,9 +69,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  chainsObserver?.disconnect()
   desktopMedia?.removeEventListener('change', updateDesktop)
-  stopChains()
 })
 
 const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
