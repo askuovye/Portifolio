@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { motion } from 'motion-v'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
-import profileImage from '@/assets/profile-joao.jpeg'
+import profileImage from '@/assets/photos/center-image.jpeg'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 const { enter } = useEnterMotion(.7)

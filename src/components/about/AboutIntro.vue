@@ -7,20 +7,27 @@ import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
 import doubleGlobeImage from '@/assets/elements/double-globe.jpg'
 import legoSkeletonImage from '@/assets/elements/lego-skeleton.png'
-import profileImage from '@/assets/profile-joao.jpeg'
-import chatbotImage from '@/assets/elements/chatbot.jpeg'
+import captcha1Image from '@/assets/photos/captcha1.jpeg'
+import captcha2Image from '@/assets/photos/captcha2.jpeg'
+import captcha3Image from '@/assets/photos/captcha3.jpg'
+import captcha4Image from '@/assets/photos/captcha4.jpeg'
+import captcha5Image from '@/assets/photos/captcha5.jpeg'
+import captcha6Image from '@/assets/photos/captcha6.jpeg'
+import captcha7Image from '@/assets/photos/captcha7.jpeg'
+import captcha8Image from '@/assets/photos/captcha8.jpeg'
+import captchaCenterImage from '@/assets/photos/center-image.jpeg'
 
 const { enter } = useEnterMotion(.7)
 const captchaImages = [
-  { src: profileImage, position: 'center 12%' },
-  { src: chatbotImage, position: 'center 32%' },
-  { src: profileImage, position: 'center 55%' },
-  { src: profileImage, position: 'left 22%' },
-  { src: chatbotImage, position: 'center 45%' },
-  { src: profileImage, position: 'right 28%' },
-  { src: profileImage, position: 'left 70%' },
-  { src: chatbotImage, position: 'center 78%' },
-  { src: profileImage, position: 'right 68%' },
+  { src: captcha1Image },
+  { src: captcha2Image },
+  { src: captcha3Image },
+  { src: captcha4Image },
+  { src: captchaCenterImage },
+  { src: captcha5Image },
+  { src: captcha6Image },
+  { src: captcha7Image },
+  { src: captcha8Image },
 ]
 const section = ref<HTMLElement | null>(null)
 const captcha = ref<InstanceType<typeof FakeCaptcha> | null>(null)

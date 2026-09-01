@@ -56,6 +56,46 @@ body::after {
   padding-top: clamp(2rem, 5vw, 5rem);
 }
 
+.decorative-video-edge-fade {
+  --video-fade-left: 10%;
+  --video-fade-right: 10%;
+  --video-fade-top: 10%;
+  --video-fade-bottom: 10%;
+
+  -webkit-mask-image:
+    linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--video-fade-left),
+      #000 calc(100% - var(--video-fade-right)),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 var(--video-fade-top),
+      #000 calc(100% - var(--video-fade-bottom)),
+      transparent 100%
+    );
+  mask-image:
+    linear-gradient(
+      to right,
+      transparent 0,
+      #000 var(--video-fade-left),
+      #000 calc(100% - var(--video-fade-right)),
+      transparent 100%
+    ),
+    linear-gradient(
+      to bottom,
+      transparent 0,
+      #000 var(--video-fade-top),
+      #000 calc(100% - var(--video-fade-bottom)),
+      transparent 100%
+    );
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+}
+
 .skip-link {
   position: fixed;
   z-index: 1000;

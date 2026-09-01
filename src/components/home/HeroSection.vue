@@ -4,7 +4,7 @@ import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
-import profileImage from '@/assets/profile-joao.jpeg'
+import profileImage from '@/assets/photos/profile-joao.jpeg'
 import cursorImage from '@/assets/elements/cursor.png'
 import devmodeBadge from '@/assets/elements/devmode-badge.png'
 import barCode from '@/assets/elements/barcode.png'
@@ -118,6 +118,7 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
     <div v-if="isDesktop && !prefersReducedMotion" ref="chains" class="hero__chains" aria-hidden="true">
       <video
         ref="chainsPlayer"
+        class="decorative-video-edge-fade"
         :src="chainsVideo"
         muted
         loop

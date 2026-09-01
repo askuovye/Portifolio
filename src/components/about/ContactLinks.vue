@@ -197,10 +197,6 @@ const links: ContactLink[] = [
   left: 40%;
   width: clamp(12rem, 27vw, 9rem);
   height: auto;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, rgb(0 0 0 / 80%) 48%, rgb(0 0 0 / 35%) 68%, transparent 88%);
-  mask-image: radial-gradient(ellipse at center, #000 30%, rgb(0 0 0 / 80%) 48%, rgb(0 0 0 / 35%) 68%, transparent 88%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }
