@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import ScrollVideo from '@/components/ui/ScrollVideo.vue'
 import canVideo from '@/assets/animations/can.mp4'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <template>
-  <aside class="experience-scroll-decoration" aria-label="Animação controlada pela rolagem">
+  <aside class="experience-scroll-decoration" :aria-label="t('experiences.accessibility.scrollAnimation')">
     <ScrollVideo
       id="experience-can"
-      class="experience-scroll-decoration__can"
+      class="experience-scroll-decoration__can decorative-video-edge-fade"
       :src="canVideo"
       :priority="9"
       trigger-selector=".experience-page"

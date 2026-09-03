@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { careerExperiences } from '@/data/experiences'
 import { careerSkillConnections, careerSkillNodes, type CareerSkillConnection } from '@/data/careerSkills'
 
 const props = defineProps<{ activeExperienceId: string }>()
+const { t } = useI18n()
 const tree = ref<HTMLElement | null>(null)
 const hoveredSkillId = ref<string | null>(null)
 const selectedSkillId = ref<string | null>(null)
@@ -16,6 +18,7 @@ const nodeMap = new Map(careerSkillNodes.map(node => [node.id, node]))
 const validConnections = careerSkillConnections.filter(connection => nodeMap.has(connection.from) && nodeMap.has(connection.to))
 
 const nodeById = (id: string) => nodeMap.get(id)
+const nodeLabel = (id: string) => t(`experiences.skillTree.nodes.${id}`)
 const isActiveNode = (id: string) => id === 'professional-core' || activeSkills.value.has(id)
 const isRelatedNode = (id: string) => {
   const inspected = inspectedSkillId.value
@@ -110,8 +113,8 @@ onBeforeUnmount(() => {
 <template>
   <section ref="tree" class="career-skill-tree" :class="{ 'has-entered': hasEntered }" aria-labelledby="career-skill-tree-title">
     <header class="career-skill-tree__header">
-      <div><span>// DIGITAL PROGRESSION</span><h3 id="career-skill-tree-title">Skill Tree</h3></div>
-      <span>PROFESSIONAL GROWTH NETWORK</span>
+      <div><span>// {{ t('experiences.skillTree.progression') }}</span><h3 id="career-skill-tree-title">{{ t('experiences.skillTree.title') }}</h3></div>
+      <span>{{ t('experiences.skillTree.network') }}</span>
     </header>
     <div class="career-skill-tree__scroll">
       <div class="career-skill-tree__canvas" :class="{ 'is-inspecting': inspectedSkillId }" @pointerdown.self="selectedSkillId = null">
@@ -135,26 +138,26 @@ onBeforeUnmount(() => {
           }"
           :style="{ '--node-x': node.x, '--node-y': node.y }" :data-node-kind="node.kind ?? 'skill'" type="button"
           :disabled="node.kind === 'locked'"
-          :aria-label="node.kind === 'locked' ? `Node futuro ${index + 1}: bloqueado` : `Skill: ${node.label}`"
+          :aria-label="node.kind === 'locked' ? t('experiences.skillTree.lockedNodeLabel', { number: index + 1 }) : t('experiences.skillTree.skillLabel', { skill: nodeLabel(node.id) })"
           :aria-pressed="node.kind === 'locked' ? undefined : selectedSkillId === node.id"
           @mouseenter="hoveredSkillId = node.id" @mouseleave="hoveredSkillId = null"
           @focus="hoveredSkillId = node.id" @blur="hoveredSkillId = null" @click.stop="inspectSkill(node.id)">
           <span class="career-skill-node__orb" aria-hidden="true"><i /></span>
-          <span class="career-skill-node__label">{{ node.label }}</span>
-          <small>{{ node.kind === 'locked' ? 'LOCKED' : `${String(node.experiences.length).padStart(2, '0')} SOURCES` }}</small>
+          <span class="career-skill-node__label">{{ nodeLabel(node.id) }}</span>
+          <small>{{ node.kind === 'locked' ? t('experiences.skillTree.locked') : t('experiences.skillTree.sourceCount', { count: String(node.experiences.length).padStart(2, '0') }) }}</small>
           <span v-if="inspectedSkillId === node.id" class="career-skill-node__tooltip" role="status">
-            <strong>{{ node.label }}</strong>
+            <strong>{{ nodeLabel(node.id) }}</strong>
             <template v-if="node.kind !== 'locked'">
-              <span>ACQUIRED THROUGH</span>
+              <span>{{ t('experiences.skillTree.acquiredThrough') }}</span>
               <i v-for="company in contributorsFor(node.experiences)" :key="company">{{ company }}</i>
-              <small>{{ String(node.experiences.length).padStart(2, '0') }} SOURCES</small>
+              <small>{{ t('experiences.skillTree.sourceCount', { count: String(node.experiences.length).padStart(2, '0') }) }}</small>
             </template>
-            <span v-else>REQUIREMENTS NOT MET</span>
+            <span v-else>{{ t('experiences.skillTree.requirementsNotMet') }}</span>
           </span>
         </button>
       </div>
     </div>
-    <p class="career-skill-tree__mobile-hint">← DESLIZE PARA EXPLORAR A REDE →</p>
+    <p class="career-skill-tree__mobile-hint">← {{ t('experiences.skillTree.mobileHint') }} →</p>
   </section>
 </template>
 

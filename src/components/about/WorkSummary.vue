@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import TypedText from '@/components/ui/TypedText.vue'
+import { useI18n } from 'vue-i18n'
 
 const section = ref<HTMLElement | null>(null)
+const { t } = useI18n()
 
 defineExpose({
   getRevealElement: () => section.value ?? undefined,
@@ -12,17 +14,17 @@ defineExpose({
 
 <template>
   <section ref="section" aria-labelledby="work-summary-title">
-    <RetroWindow class="work-summary" title="work_summary.sh" close-label="Janela decorativa sobre meu trabalho">
+    <RetroWindow class="work-summary" title="work_summary.sh" :close-label="t('about.work.windowLabel')">
       <div class="terminal">
         <div class="terminal__toolbar" aria-hidden="true">
           <span>TERMINAL_01</span>
           <span>UTF-8 · BASH</span>
         </div>
         <p class="terminal__command"><span>joao@dev:~$</span> <TypedText text="whoami --work" :delay="100" :speed="32" /></p>
-        <TypedText id="work-summary-title" class="terminal__title" tag="h2" text="O que eu faço exatamente?" :delay="600" :speed="24" />
+        <TypedText id="work-summary-title" class="terminal__title" tag="h2" :text="t('about.work.title')" :delay="600" :speed="24" />
         <div class="terminal__output">
-          <p><span>01</span><TypedText text="Freelancer full stack e projetos pessoais que estimulam minha criatividade." :delay="1250" :speed="14" /></p>
-          <p><span>02</span><TypedText text="Graduando em Engenharia de Software e evoluindo para oportunidades remotas internacionais." :delay="2200" :speed="12" /></p>
+          <p><span>01</span><TypedText :text="t('about.work.freelance')" :delay="1250" :speed="14" /></p>
+          <p><span>02</span><TypedText :text="t('about.work.education')" :delay="2200" :speed="12" /></p>
         </div>
         <p class="terminal__cursor" aria-hidden="true"><TypedText text="joao@dev:~$" :delay="3350" :speed="26" /> <i>_</i></p>
       </div>

@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CareerExperience } from '@/data/experiences'
-import memoryCardImage from '@/assets/elements/memory-card.png'
+import memoryCardImage from '@/assets/elements/memory-card.webp'
 
 const props = defineProps<{
   experience: CareerExperience
   active: boolean
   reading: boolean
 }>()
+const { t } = useI18n()
 
 defineEmits<{
   select: []
@@ -90,7 +92,7 @@ onBeforeUnmount(() => {
     class="memory-card"
     :class="{ 'memory-card--active': active, 'memory-card--reading': reading }"
     type="button"
-    :aria-label="`Carregar experiência ${experience.company}`"
+    :aria-label="t('experiences.memoryCard.loadExperience', { company: experience.company })"
     :aria-pressed="active"
     :aria-current="active ? 'true' : undefined"
     @click="$emit('select')"
@@ -102,14 +104,14 @@ onBeforeUnmount(() => {
       <span class="memory-card__content">
         <span class="memory-card__slot">SLOT {{ String(experience.slot).padStart(2, '0') }}</span>
         <span class="memory-card__label">
-          <small>CAREER DATA</small>
+          <small>{{ t('experiences.memoryCard.careerData') }}</small>
           <strong :class="{ 'is-long': experience.company.length > 18 }">{{ experience.company }}</strong>
           <span>{{ experience.role }}</span>
           <span>{{ experience.period }}</span>
         </span>
         <span class="memory-card__meta">
-          <span>{{ active ? 'ACTIVE SAVE' : (experience.status === 'active' ? 'IN PROGRESS' : 'COMPLETED') }}</span>
-          <span>{{ String(experience.skills.length).padStart(2, '0') }} SKILLS</span>
+          <span>{{ active ? t('experiences.memoryCard.activeSave') : (experience.status === 'active' ? t('experiences.memoryCard.inProgress') : t('experiences.memoryCard.completed')) }}</span>
+          <span>{{ t('experiences.memoryCard.skillCount', { count: String(experience.skills.length).padStart(2, '0') }) }}</span>
         </span>
         <span class="memory-card__footer">
           <span>{{ experience.saveFile }}</span>

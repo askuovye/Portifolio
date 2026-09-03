@@ -1,16 +1,24 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { careerExperiences } from '@/data/experiences'
 import CareerMemoryCards from './CareerMemoryCards.vue'
 import CareerSaveData from './CareerSaveData.vue'
 import CareerSkillTree from './CareerSkillTree.vue'
 
 const selectedExperienceId = ref(careerExperiences[0]?.id ?? '')
+const { t } = useI18n()
 const activeExperienceId = ref(selectedExperienceId.value)
 const isReadingSave = ref(false)
 let readingTimer: number | undefined
 
-const activeExperience = computed(() => careerExperiences.find(item => item.id === activeExperienceId.value) ?? careerExperiences[0]!)
+const localizedExperiences = computed(() => careerExperiences.map(experience => ({
+  ...experience,
+  role: t(`experiences.items.${experience.id}.role`),
+  period: t(`experiences.items.${experience.id}.period`),
+  activities: experience.activities.map((_, index) => t(`experiences.items.${experience.id}.activities.${index}`)),
+})))
+const activeExperience = computed(() => localizedExperiences.value.find(item => item.id === activeExperienceId.value) ?? localizedExperiences.value[0]!)
 
 const selectExperience = (id: string) => {
   if (id === selectedExperienceId.value && !isReadingSave.value) return
@@ -30,18 +38,18 @@ onBeforeUnmount(() => window.clearTimeout(readingTimer))
   <section class="career-system" aria-labelledby="career-system-title">
     <header class="career-system__intro">
       <div>
-        <p>// EXPERIENCE ARCHIVE</p>
-        <h4 id="career-system-title">Career data found.</h4>
+        <p>// {{ t('experiences.career.archive') }}</p>
+        <h4 id="career-system-title">{{ t('experiences.career.dataFound') }}</h4>
       </div>
-      <div class="career-system__diagnostic" aria-label="Diagnóstico do sistema">
-        <span>SYSTEM CHECK: OK</span>
-        <span>MEMORY MODULES: {{ String(careerExperiences.length).padStart(2, '0') }}</span>
-        <span>STATUS: <i>ONLINE</i></span>
+      <div class="career-system__diagnostic" :aria-label="t('experiences.career.diagnosticLabel')">
+        <span>{{ t('experiences.career.systemCheck') }}: OK</span>
+        <span>{{ t('experiences.career.memoryModules') }}: {{ String(careerExperiences.length).padStart(2, '0') }}</span>
+        <span>{{ t('experiences.career.status') }}: <i>ONLINE</i></span>
       </div>
     </header>
 
     <CareerMemoryCards
-      :experiences="careerExperiences"
+      :experiences="localizedExperiences"
       :selected-id="selectedExperienceId"
       :reading="isReadingSave"
       @select="selectExperience"

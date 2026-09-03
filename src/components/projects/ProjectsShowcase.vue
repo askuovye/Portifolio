@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import ProjectPlayer from './ProjectPlayer.vue'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
-import doubleChainsVideo from '@/assets/animations/double-chain.mp4'
+import doubleChainsVideo from '@/assets/animations/double-chain.webm'
 
 const showcase = ref<HTMLElement | null>(null)
 const chainsPlayer = ref<HTMLVideoElement | null>(null)
@@ -15,7 +15,7 @@ useDecorativeVideo(chainsPlayer, {
 <template>
   <div ref="showcase" class="projects-showcase">
     <div class="projects-showcase__chains" aria-hidden="true">
-      <video ref="chainsPlayer" :src="doubleChainsVideo" muted loop playsinline preload="metadata" />
+      <video ref="chainsPlayer" class="decorative-video-edge-fade" :src="doubleChainsVideo" muted loop playsinline preload="metadata" />
     </div>
     <ProjectPlayer class="projects-showcase__player" />
   </div>

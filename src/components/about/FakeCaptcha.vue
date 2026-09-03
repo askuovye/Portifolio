@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
-import profileImage from '@/assets/photos/center-image.jpeg'
+import profileImage from '@/assets/photos/center-image.webp'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 const { enter } = useEnterMotion(.7)
+const { t } = useI18n()
 
 interface CaptchaImage {
   src: string
@@ -49,21 +51,21 @@ const reset = () => {
 </script>
 
 <template>
-  <RetroWindow class="captcha" title="human_check.exe" close-label="Janela decorativa de verificação">
+  <RetroWindow class="captcha" title="human_check.exe" :close-label="t('about.captcha.windowLabel')">
     <div class="captcha__body">
       <header class="captcha__prompt">
-        <motion.h2 v-bind="enter(0.82)">Selecione todos os quadrados com <strong>UM CARA MANEIRO</strong></motion.h2>
-        <motion.p v-bind="enter(0.9)">Clique nas 9 imagens para revelar a identidade.</motion.p>
+        <motion.h2 v-bind="enter(0.82)">{{ t('about.captcha.promptBefore') }} <strong>{{ t('about.captcha.promptSubject') }}</strong></motion.h2>
+        <motion.p v-bind="enter(0.9)">{{ t('about.captcha.instructions') }}</motion.p>
       </header>
 
-      <div class="captcha__grid" :class="{ 'captcha__grid--complete': isComplete }" role="group" aria-label="Desafio visual com nove imagens">
+      <div class="captcha__grid" :class="{ 'captcha__grid--complete': isComplete }" role="group" :aria-label="t('about.captcha.gridLabel')">
         <button
           v-for="tile in tiles"
           :key="tile.id"
           type="button"
           class="captcha__tile"
           :class="{ 'captcha__tile--revealed': revealed[tile.id] }"
-          :aria-label="revealed[tile.id] ? `Imagem ${tile.id + 1} revelada` : `Revelar imagem ${tile.id + 1}`"
+          :aria-label="revealed[tile.id] ? t('about.captcha.tileRevealed', { number: tile.id + 1 }) : t('about.captcha.revealTile', { number: tile.id + 1 })"
           :aria-pressed="revealed[tile.id]"
           @click="revealTile(tile.id)"
         >
@@ -88,11 +90,11 @@ const reset = () => {
       <footer class="captcha__footer">
         <div class="captcha__progress" aria-live="polite">
           <span :class="{ 'captcha__status--verified': isVerified }">
-            {{ isVerified ? 'IDENTIDADE_VERIFICADA' : `SELECIONADOS ${revealedCount}/09` }}
+            {{ isVerified ? t('about.captcha.verified') : t('about.captcha.selected', { count: revealedCount }) }}
           </span>
         </div>
         <button class="captcha__reset" type="button" :disabled="revealedCount === 0" @click="reset">
-          {{ isComplete ? '[ REINICIAR ]' : '[ LIMPAR ]' }}
+          {{ isComplete ? t('about.captcha.restart') : t('about.captcha.clear') }}
         </button>
       </footer>
     </div>
@@ -100,7 +102,7 @@ const reset = () => {
 </template>
 
 <style scoped lang="scss">
-.captcha { width: min(100%, 31rem); }
+.captcha { width: 100%; min-width: 0; max-width: 31rem; }
 .captcha__body { padding: clamp(.75rem, 2vw, 1.1rem); background: #090909; }
 .captcha__prompt { padding: 1rem; background: var(--accent); color: white; }
 .captcha__prompt > span { display: block; margin-bottom: .65rem; font-family: var(--font-mono); font-size: .6rem; letter-spacing: .1em; }

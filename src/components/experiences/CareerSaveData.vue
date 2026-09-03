@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { CareerExperience } from '@/data/experiences'
-import barbedWireImage from '@/assets/elements/barbedwire.png'
+import { useI18n } from 'vue-i18n'
+import barbedWireImage from '@/assets/elements/barbedwire.webp'
 
 defineProps<{
   experience: CareerExperience
   reading: boolean
 }>()
+const { t } = useI18n()
 </script>
 
 <template>
@@ -13,26 +15,26 @@ defineProps<{
     <img class="save-data__barbed-wire" :src="barbedWireImage" alt="" aria-hidden="true">
     <section class="save-data" :class="{ 'save-data--reading': reading }" aria-labelledby="save-data-title" aria-live="polite">
       <header class="save-data__bar">
-        <span id="save-data-title">// CAREER SAVE DATA</span>
-        <span>{{ reading ? 'READING...' : experience.saveFile }}</span>
+        <span id="save-data-title">// {{ t('experiences.saveData.title') }}</span>
+        <span>{{ reading ? t('experiences.saveData.readingShort') : experience.saveFile }}</span>
       </header>
       <div v-if="reading" class="save-data__reading">
-        <span>READING CAREER DATA</span><i aria-hidden="true" />
+        <span>{{ t('experiences.saveData.reading') }}</span><i aria-hidden="true" />
       </div>
       <div v-else class="save-data__body">
         <dl class="save-data__facts">
-          <div><dt>ROLE</dt><dd>{{ experience.role }}</dd></div>
-          <div><dt>PERIOD</dt><dd>{{ experience.period }}</dd></div>
-          <div><dt>STATUS</dt><dd :class="{ 'is-active': experience.status === 'active' }">{{ experience.status.toUpperCase() }}</dd></div>
+          <div><dt>{{ t('experiences.saveData.role') }}</dt><dd>{{ experience.role }}</dd></div>
+          <div><dt>{{ t('experiences.saveData.period') }}</dt><dd>{{ experience.period }}</dd></div>
+          <div><dt>{{ t('experiences.saveData.status') }}</dt><dd :class="{ 'is-active': experience.status === 'active' }">{{ experience.status === 'active' ? t('experiences.saveData.active') : t('experiences.saveData.completed') }}</dd></div>
         </dl>
         <div class="save-data__description">
-          <span>DESCRIPTION.LOG</span>
+          <span>{{ t('experiences.saveData.descriptionLog') }}</span>
           <ul>
             <li v-for="activity in experience.activities" :key="activity">{{ activity }}</li>
           </ul>
         </div>
         <footer>
-          <span>SKILLS ACQUIRED</span>
+          <span>{{ t('experiences.saveData.skillsAcquired') }}</span>
           <strong>{{ String(experience.skills.length).padStart(2, '0') }}</strong>
         </footer>
       </div>

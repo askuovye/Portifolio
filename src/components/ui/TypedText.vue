@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useReducedMotion } from 'motion-v'
 
 const props = withDefaults(defineProps<{
@@ -57,6 +57,13 @@ onMounted(() => {
     observer?.disconnect()
   }, { threshold: 0.2 })
   if (root.value) observer.observe(root.value)
+})
+
+watch(() => props.text, (text) => {
+  if (!hasStarted) return
+  window.clearTimeout(delayTimer)
+  window.clearInterval(typingTimer)
+  visibleText.value = text
 })
 
 onBeforeUnmount(() => {

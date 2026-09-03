@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
@@ -28,18 +29,19 @@ const featuredExperienceIds = new Set([
 ])
 
 const skillLabels = new Map(careerSkillNodes.map(skill => [skill.id, skill.label]))
+const { t } = useI18n()
 
-const experiences: ExperienceSummary[] = careerExperiences
+const experiences = computed<ExperienceSummary[]>(() => careerExperiences
   .filter(experience => featuredExperienceIds.has(experience.id))
   .map(experience => ({
     id: experience.id,
-    period: experience.period.replace(' – ', ' — '),
-    role: experience.role,
+    period: t(`home.experience.items.${experience.id}.period`),
+    role: t(`home.experience.items.${experience.id}.role`),
     company: experience.company,
-    description: experience.activities[0] ?? '',
+    description: t(`home.experience.items.${experience.id}.description`),
     technologies: experience.skills.map(skill => skillLabels.get(skill) ?? skill),
     current: experience.status === 'active',
-  }))
+  })))
 
 const section = ref<HTMLElement | null>(null)
 
@@ -118,10 +120,10 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 <template>
   <section ref="section" class="experiences" aria-labelledby="experiences-title">
-    <aside class="experiences__video-track" aria-label="Animação Nokia controlada pela rolagem">
+    <aside class="experiences__video-track" :aria-label="t('home.experience.nokiaAnimationLabel')">
       <ScrollVideo
         id="home-nokia"
-        class="experiences__video-frame"
+        class="experiences__video-frame decorative-video-edge-fade"
         :src="nokiaVideo"
         :priority="10"
         trigger-selector=".experiences"
@@ -132,10 +134,10 @@ useGsapContext(section, ({ reducedMotion }) => {
 
     <div class="experiences__heading">
       <div>
-        <p class="experiences__eyebrow">HISTÓRICO_PROFISSIONAL.LOG</p>
-        <SectionTitle id="experiences-title" :level="2">Experiências</SectionTitle>
+        <p class="experiences__eyebrow">{{ t('home.experience.eyebrow') }}</p>
+        <SectionTitle id="experiences-title" :level="2">{{ t('home.experience.title') }}</SectionTitle>
       </div>
-      <p class="experiences__intro">Do atendimento internacional ao desenvolvimento full stack — experiências diferentes, conectadas pela vontade de resolver problemas.</p>
+      <p class="experiences__intro">{{ t('home.experience.intro') }}</p>
     </div>
 
     <div class="timeline">
@@ -156,17 +158,17 @@ useGsapContext(section, ({ reducedMotion }) => {
         <RetroWindow
           class="experience__window"
           :title="`EXP_${String(index + 1).padStart(2, '0')}.EXE`"
-          :close-label="`Janela da experiência ${experience.role}`"
+          :close-label="t('home.experience.windowLabel', { role: experience.role })"
         >
           <div class="experience__body">
             <div class="experience__meta">
               <span>{{ experience.period }}</span>
-              <span v-if="experience.current" class="experience__status"><i /> EM CURSO</span>
+              <span v-if="experience.current" class="experience__status"><i /> {{ t('home.experience.current') }}</span>
             </div>
             <h3>{{ experience.role }}</h3>
             <p class="experience__company">@ {{ experience.company }}</p>
             <p class="experience__description">{{ experience.description }}</p>
-            <ul class="experience__tags" aria-label="Competências e tecnologias">
+            <ul class="experience__tags" :aria-label="t('home.experience.skillsLabel')">
               <li v-for="technology in experience.technologies" :key="technology">[ {{ technology }} ]</li>
             </ul>
           </div>
@@ -175,8 +177,8 @@ useGsapContext(section, ({ reducedMotion }) => {
     </div>
 
     <div class="experiences__footer">
-      <span aria-hidden="true">{{ String(experiences.length).padStart(2, '0') }} REGISTROS ENCONTRADOS_</span>
-      <RetroButton to="/experiences" arrow>Ver trajetória completa</RetroButton>
+      <span aria-hidden="true">{{ String(experiences.length).padStart(2, '0') }} {{ t('home.experience.recordsFound') }}</span>
+      <RetroButton to="/experiences" arrow>{{ t('home.experience.viewAll') }}</RetroButton>
     </div>
   </section>
 </template>
@@ -209,12 +211,17 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 .experiences__video-track {
   position: absolute;
-  z-index: 2;
+  z-index: 0;
   inset: 0;
   pointer-events: none;
 }
 
 .experiences__video-frame {
+  --video-fade-left: 22%;
+  --video-fade-right: 4%;
+  --video-fade-top: 8%;
+  --video-fade-bottom: 5%;
+
   position: sticky;
   top: clamp(5rem, 9vh, 7rem);
   width: clamp(40rem, 13vw, 12rem);

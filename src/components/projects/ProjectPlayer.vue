@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import { gsap } from '@/animations/gsap'
 import { useEnterMotion } from '@/composables/useEnterMotion'
@@ -17,7 +18,14 @@ const player = ref<HTMLElement | null>(null)
 const nowPlayingContent = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
 const { enter } = useEnterMotion(.7)
-const activeProject = computed(() => projects[activeProjectIndex.value] ?? projects[0]!)
+const { t } = useI18n()
+const localizedProjects = computed(() => projects.map(project => ({
+  ...project,
+  subtitle: t(`projects.items.${project.id}.subtitle`),
+  description: t(`projects.items.${project.id}.description`),
+  category: t(`projects.items.${project.id}.category`),
+})))
+const activeProject = computed(() => localizedProjects.value[activeProjectIndex.value] ?? localizedProjects.value[0]!)
 const elapsedTime = computed(() => formatTime(activeProject.value.durationSeconds * progress.value / 100))
 
 let animationFrame: number | undefined
@@ -133,16 +141,16 @@ onBeforeUnmount(() => {
     ref="player"
     class="project-player"
     tabindex="0"
-    aria-label="Player de projetos. Use as setas para navegar e espaço para reproduzir ou pausar."
+    :aria-label="t('projects.player.keyboardInstructions')"
     @keydown="handlePlayerKeydown"
   >
     <motion.div v-bind="enter(.12, { scale: .985 })">
-      <RetroWindow title="JOAO_DEV.MP3 — PROJECT PLAYER" close-label="Janela do player de projetos">
+      <RetroWindow title="JOAO_DEV.MP3 — PROJECT PLAYER" :close-label="t('projects.player.windowLabel')">
       <div class="project-player__shell">
         <div class="project-player__display" aria-live="polite">
           <span aria-hidden="true">▶</span>
           <div class="project-player__marquee">
-            <p :key="activeProject.id">NOW PLAYING: {{ activeProject.title }} — {{ activeProject.subtitle }}</p>
+            <p :key="activeProject.id">{{ t('projects.player.nowPlaying') }}: {{ activeProject.title }} — {{ activeProject.subtitle }}</p>
           </div>
           <div class="project-player__format" aria-hidden="true">
             <span>STEREO</span><span>44.1 KHZ</span><span>320 KBPS</span>
@@ -152,7 +160,7 @@ onBeforeUnmount(() => {
 
         <div class="project-player__main">
           <ProjectPlaylist
-            :projects="projects"
+            :projects="localizedProjects"
             :active-index="activeProjectIndex"
             :is-playing="isPlaying"
             @select="selectProject"
@@ -164,24 +172,24 @@ onBeforeUnmount(() => {
 
         <div class="project-player__controls">
           <div class="project-player__counter">
-            <span>Track</span>
+            <span>{{ t('projects.player.track') }}</span>
             <strong>{{ String(activeProject.track).padStart(2, '0') }} / {{ String(projects.length).padStart(2, '0') }}</strong>
           </div>
 
           <div class="project-player__transport">
-            <button type="button" aria-label="Projeto anterior" @click="previousProject">
+            <button type="button" :aria-label="t('projects.player.previous')" @click="previousProject">
               <Icon icon="mdi:skip-previous" aria-hidden="true" />
             </button>
-            <button class="project-player__play" type="button" :aria-label="isPlaying ? 'Pausar apresentação' : 'Reproduzir apresentação'" @click="togglePlay">
+            <button class="project-player__play" type="button" :aria-label="isPlaying ? t('projects.player.pause') : t('projects.player.play')" @click="togglePlay">
               <Icon :icon="isPlaying ? 'mdi:pause' : 'mdi:play'" aria-hidden="true" />
             </button>
-            <button type="button" aria-label="Próximo projeto" @click="nextProject">
+            <button type="button" :aria-label="t('projects.player.next')" @click="nextProject">
               <Icon icon="mdi:skip-next" aria-hidden="true" />
             </button>
           </div>
 
           <div class="project-player__status" :class="{ 'project-player__status--playing': isPlaying }">
-            <span>{{ isPlaying ? 'Playing' : 'Paused' }}</span>
+            <span>{{ isPlaying ? t('projects.player.playing') : t('projects.player.paused') }}</span>
             <ProjectEqualizer :playing="isPlaying" />
           </div>
 
@@ -190,7 +198,7 @@ onBeforeUnmount(() => {
             <button
               class="project-player__progress"
               type="button"
-              :aria-label="`Progresso da apresentação: ${Math.round(progress)}%. Clique para alterar.`"
+              :aria-label="t('projects.player.progressLabel', { progress: Math.round(progress) })"
               :aria-valuenow="Math.round(progress)"
               aria-valuemin="0"
               aria-valuemax="100"

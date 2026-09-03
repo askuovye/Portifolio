@@ -2,15 +2,17 @@
 import { nextTick, ref, watch } from 'vue'
 import { Icon } from '@iconify/vue'
 import { useReducedMotion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import type { Project } from '@/data/projects'
 
 const props = defineProps<{ project: Project; isPlaying: boolean }>()
 
 const cover = ref<HTMLElement | null>(null)
-const image = ref<HTMLImageElement | null>(null)
+const media = ref<HTMLImageElement | HTMLVideoElement | null>(null)
 const pausedFrame = ref<HTMLCanvasElement | null>(null)
 const hasPausedFrame = ref(false)
 const prefersReducedMotion = useReducedMotion()
+const { t } = useI18n()
 
 const moveCover = (event: PointerEvent) => {
   if (prefersReducedMotion.value || event.pointerType === 'touch' || !cover.value) return
@@ -28,12 +30,17 @@ const resetCover = () => {
 
 const capturePausedFrame = async () => {
   await nextTick()
-  const source = image.value
+  const source = media.value
   const canvas = pausedFrame.value
-  if (!source || !canvas || !source.complete || !source.naturalWidth) return
+  if (!source || !canvas) return
 
-  canvas.width = source.naturalWidth
-  canvas.height = source.naturalHeight
+  const sourceWidth = source instanceof HTMLVideoElement ? source.videoWidth : source.naturalWidth
+  const sourceHeight = source instanceof HTMLVideoElement ? source.videoHeight : source.naturalHeight
+  const isReady = source instanceof HTMLVideoElement ? source.readyState >= 2 : source.complete
+  if (!isReady || !sourceWidth || !sourceHeight) return
+
+  canvas.width = sourceWidth
+  canvas.height = sourceHeight
   const context = canvas.getContext('2d')
   if (!context) return
   context.drawImage(source, 0, 0, canvas.width, canvas.height)
@@ -54,7 +61,7 @@ watch(() => props.project.id, () => {
 <template>
   <section class="now-playing" aria-labelledby="now-playing-title">
     <header class="now-playing__header">
-      <h2 id="now-playing-title">Now playing</h2>
+      <h2 id="now-playing-title">{{ t('projects.nowPlaying.title') }}</h2>
       <span>DEV.MP3 / {{ project.year }}</span>
     </header>
 
@@ -65,7 +72,19 @@ watch(() => props.project.id, () => {
         <span>— □ ×</span>
       </div>
       <div class="now-playing__image-wrap">
-        <img ref="image" :src="project.image" :alt="`Captura de tela do projeto ${project.title}`" @load="!isPlaying && capturePausedFrame()">
+        <video
+          v-if="project.mediaType === 'video'"
+          ref="media"
+          :src="project.image"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          :aria-label="t('projects.nowPlaying.animatedPreviewAlt', { project: project.title })"
+          @loadeddata="!isPlaying && capturePausedFrame()"
+        />
+        <img v-else ref="media" :src="project.image" :alt="t('projects.nowPlaying.previewAlt', { project: project.title })" @load="!isPlaying && capturePausedFrame()">
         <canvas ref="pausedFrame" class="now-playing__paused-frame" :class="{ 'now-playing__paused-frame--visible': hasPausedFrame }" aria-hidden="true" />
         <span class="now-playing__scanlines" aria-hidden="true" />
         <span class="now-playing__reflection" aria-hidden="true" />
@@ -73,14 +92,14 @@ watch(() => props.project.id, () => {
       </div>
 
       <div class="now-playing__details">
-      <p class="now-playing__meta">TRACK {{ String(project.track).padStart(2, '0') }} · {{ project.category }}</p>
+      <p class="now-playing__meta">{{ t('projects.player.track').toUpperCase() }} {{ String(project.track).padStart(2, '0') }} · {{ project.category }}</p>
       <h3>{{ project.title }}</h3>
       <p class="now-playing__subtitle">{{ project.subtitle }}</p>
       <p class="now-playing__description">{{ project.description }}</p>
 
       <div class="now-playing__stack">
         <span>STACK:</span>
-        <ul aria-label="Tecnologias utilizadas">
+        <ul :aria-label="t('projects.nowPlaying.technologiesLabel')">
           <li v-for="technology in project.technologies" :key="technology">{{ technology }}</li>
         </ul>
       </div>
@@ -88,11 +107,11 @@ watch(() => props.project.id, () => {
       <div v-if="project.live || project.github" class="now-playing__actions">
         <a v-if="project.live" :href="project.live" target="_blank" rel="noopener noreferrer">
           <Icon icon="mdi:open-in-new" aria-hidden="true" />
-          View project
+          {{ t('projects.nowPlaying.viewProject') }}
         </a>
         <a v-if="project.github" :href="project.github" target="_blank" rel="noopener noreferrer">
           <Icon icon="mdi:github" aria-hidden="true" />
-          Source code
+          {{ t('projects.nowPlaying.sourceCode') }}
         </a>
       </div>
       </div>
@@ -173,7 +192,8 @@ watch(() => props.project.id, () => {
   border: .45rem solid #151515;
 }
 
-.now-playing__image-wrap img {
+.now-playing__image-wrap img,
+.now-playing__image-wrap video {
   width: 100%;
   height: 100%;
   object-fit: cover;

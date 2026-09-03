@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Project } from '@/data/projects'
+import { useI18n } from 'vue-i18n'
 import ProjectEqualizer from './ProjectEqualizer.vue'
 
 defineProps<{
@@ -11,13 +12,15 @@ defineProps<{
 const emit = defineEmits<{
   select: [index: number]
 }>()
+
+const { t } = useI18n()
 </script>
 
 <template>
   <section class="playlist" aria-labelledby="playlist-title">
     <header class="playlist__header">
-      <h2 id="playlist-title">Project playlist</h2>
-      <span>{{ String(projects.length).padStart(2, '0') }} tracks</span>
+      <h2 id="playlist-title">{{ t('projects.playlist.title') }}</h2>
+      <span>{{ t('projects.playlist.trackCount', { count: String(projects.length).padStart(2, '0') }) }}</span>
     </header>
 
     <ol class="playlist__tracks">
@@ -27,13 +30,13 @@ const emit = defineEmits<{
           :class="{ 'playlist-track--active': activeIndex === index }"
           type="button"
           :aria-current="activeIndex === index ? 'true' : undefined"
-          :aria-label="`Selecionar projeto ${project.title}`"
+          :aria-label="t('projects.playlist.selectProject', { project: project.title })"
           @click="emit('select', index)"
         >
           <span class="playlist-track__marker" aria-hidden="true">
             {{ activeIndex === index ? '▶' : String(project.track).padStart(2, '0') }}
           </span>
-          <img :src="project.image" :alt="`Miniatura de ${project.title}`" loading="lazy">
+          <img :src="project.thumbnail ?? project.image" :alt="t('projects.playlist.thumbnailAlt', { project: project.title })" loading="lazy">
           <span class="playlist-track__copy">
             <strong>{{ project.title }}</strong>
             <small>{{ project.category }}</small>

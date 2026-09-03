@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import skullVideo from '@/assets/animations/skull.mp4'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import { useEnterMotion } from '@/composables/useEnterMotion'
@@ -10,23 +11,24 @@ const skullPlayer = ref<HTMLVideoElement | null>(null)
 useDecorativeVideo(skullPlayer, { target: contactHero, threshold: .02 })
 
 const { enter } = useEnterMotion(.44)
+const { t } = useI18n()
 </script>
 
 <template>
   <div ref="contactHero" class="contact-hero">
     <div class="contact-hero__skull" aria-hidden="true">
-      <video ref="skullPlayer" :src="skullVideo" muted loop playsinline preload="metadata" />
+      <video ref="skullPlayer" class="decorative-video-edge-fade" :src="skullVideo" muted loop playsinline preload="metadata" />
     </div>
     <motion.p class="contact-hero__eyebrow" v-bind="enter(.03)">
-      <span>//</span> CONTATO
+      <span>//</span> {{ t('contact.hero.eyebrow') }}
     </motion.p>
     <motion.h1 id="contact-title" class="contact-hero__title" v-bind="enter(.12)">
-      <span>Contato</span>
-      <strong>Vamos<br>conversar.</strong>
+      <span>{{ t('contact.hero.title') }}</span>
+      <strong>{{ t('contact.hero.headingFirst') }}<br>{{ t('contact.hero.headingSecond') }}</strong>
     </motion.h1>
     <motion.p class="contact-hero__intro" v-bind="enter(.22)">
       <span aria-hidden="true" />
-      Vamos conversar sobre seu<br>projeto ou oportunidade.
+      {{ t('contact.hero.descriptionFirst') }}<br>{{ t('contact.hero.descriptionSecond') }}
     </motion.p>
   </div>
 </template>
@@ -150,8 +152,11 @@ const { enter } = useEnterMotion(.44)
   .contact-hero { min-height: 29rem; }
 
   .contact-hero__title {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
     margin-top: 2.5rem;
-    font-size: clamp(3.25rem, 14vw, 6.2rem);
+    font-size: min(3.25rem, 12.2vw);
   }
 }
 
