@@ -2,6 +2,19 @@ import { watch, type WatchStopHandle } from 'vue'
 import type { Router } from 'vue-router'
 import { i18n, type SupportedLocale } from '@/i18n'
 
+export const resolveSiteUrl = (value: string | undefined): string | undefined => {
+  if (!value?.trim()) return undefined
+  try {
+    const url = new URL(value.trim())
+    if (!['http:', 'https:'].includes(url.protocol)) return undefined
+    return url.href.replace(/\/$/, '')
+  } catch {
+    return undefined
+  }
+}
+
+const SITE_URL = resolveSiteUrl(import.meta.env.VITE_SITE_URL)
+
 const routeKeys = {
   home: 'home',
   about: 'about',
@@ -28,17 +41,19 @@ const setMeta = (attribute: 'name' | 'property', key: string, content: string) =
   element.content = content
 }
 
-const setCanonical = (path: string) => {
+const setCanonical = (url: string) => {
   let element = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
   if (!element) {
     element = document.createElement('link')
     element.rel = 'canonical'
     document.head.append(element)
   }
-  element.href = new URL(path, window.location.origin).href
+  element.href = url
 }
 
-export const setupSeoMetadata = (router: Router): WatchStopHandle => watch(
+const removeElement = (selector: string) => document.head.querySelector(selector)?.remove()
+
+export const setupSeoMetadata = (router: Router, configuredSiteUrl = SITE_URL): WatchStopHandle => watch(
   [router.currentRoute, i18n.global.locale],
   ([route, locale]) => {
     if (typeof document === 'undefined' || typeof window === 'undefined') return
@@ -59,7 +74,19 @@ export const setupSeoMetadata = (router: Router): WatchStopHandle => watch(
     setMeta('name', 'twitter:card', 'summary_large_image')
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
-    setCanonical(route.path)
+
+    const siteUrl = resolveSiteUrl(configuredSiteUrl)
+    if (siteUrl) {
+      const pageUrl = new URL(route.path, `${siteUrl}/`).href
+      const imageUrl = new URL('/og-image.png', `${siteUrl}/`).href
+      setCanonical(pageUrl)
+      setMeta('property', 'og:url', pageUrl)
+      setMeta('property', 'og:image', imageUrl)
+      setMeta('name', 'twitter:image', imageUrl)
+    } else {
+      removeElement('link[rel="canonical"]')
+      removeElement('meta[property="og:url"]')
+    }
   },
   { immediate: true },
 )
