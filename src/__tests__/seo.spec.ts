@@ -24,18 +24,20 @@ describe('SEO metadata', () => {
     setLocale('pt-BR', false)
     document.head.querySelector('link[rel="canonical"]')?.remove()
     document.head.querySelector('meta[property="og:url"]')?.remove()
+    document.head.querySelector('meta[name="robots"]')?.remove()
   })
 
-  it('keeps relative social images and omits URL tags without VITE_SITE_URL', async () => {
-    document.head.innerHTML = '<meta property="og:image" content="/og-image.png"><meta name="twitter:image" content="/og-image.png">'
+  it('uses the canonical production domain by default', async () => {
+    document.head.innerHTML = '<meta property="og:image" content="/og-image.jpg"><meta name="twitter:image" content="/og-image.jpg">'
     const router = createTestRouter()
     await router.push('/')
     const stop = setupSeoMetadata(router, undefined)
 
-    expect(document.head.querySelector('link[rel="canonical"]')).toBeNull()
-    expect(document.head.querySelector('meta[property="og:url"]')).toBeNull()
-    expect(metaContent('meta[property="og:image"]')).toBe('/og-image.png')
-    expect(metaContent('meta[name="twitter:image"]')).toBe('/og-image.png')
+    expect(document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe('https://joaofortes.dev/')
+    expect(metaContent('meta[property="og:url"]')).toBe('https://joaofortes.dev/')
+    expect(metaContent('meta[property="og:image"]')).toBe('https://joaofortes.dev/og-image.jpg')
+    expect(metaContent('meta[name="twitter:image"]')).toBe('https://joaofortes.dev/og-image.jpg')
+    expect(metaContent('meta[name="robots"]')).toBe('index,follow')
     expect(resolveSiteUrl(undefined)).toBeUndefined()
     expect(resolveSiteUrl('not-a-url')).toBeUndefined()
 
@@ -51,10 +53,11 @@ describe('SEO metadata', () => {
     expect(document.title).toBe('João Fortes | Desenvolvedor Full Stack')
     expect(metaContent('meta[name="description"]')).toContain('Laravel, Vue.js')
     expect(metaContent('meta[property="og:type"]')).toBe('website')
+    expect(metaContent('meta[property="og:site_name"]')).toBe('João Fortes')
     expect(metaContent('meta[property="og:locale"]')).toBe('pt_BR')
     expect(metaContent('meta[name="twitter:card"]')).toBe('summary_large_image')
-    expect(metaContent('meta[property="og:image"]')).toBe('https://portfolio.test/og-image.png')
-    expect(metaContent('meta[name="twitter:image"]')).toBe('https://portfolio.test/og-image.png')
+    expect(metaContent('meta[property="og:image"]')).toBe('https://portfolio.test/og-image.jpg')
+    expect(metaContent('meta[name="twitter:image"]')).toBe('https://portfolio.test/og-image.jpg')
     expect(metaContent('meta[property="og:url"]')).toBe('https://portfolio.test/')
     expect(document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe('https://portfolio.test/')
 
@@ -75,7 +78,9 @@ describe('SEO metadata', () => {
     await router.push('/missing-page')
     expect(document.title).toBe('Page Not Found | João Fortes')
     expect(metaContent('meta[name="description"]')).toContain('could not be found')
-    expect(document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')?.href).toBe('https://portfolio.test/missing-page')
+    expect(metaContent('meta[name="robots"]')).toBe('noindex,follow')
+    expect(document.head.querySelector('link[rel="canonical"]')).toBeNull()
+    expect(document.head.querySelector('meta[property="og:url"]')).toBeNull()
 
     stop()
   })

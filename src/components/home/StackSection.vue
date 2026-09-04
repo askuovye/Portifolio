@@ -226,7 +226,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 
 .stack-card__technologies {
   display: grid;
-  grid-template-columns: repeat(2, minmax(2, 1fr));
+  grid-template-columns: 1fr;
   gap: clamp(.25rem, .1vw, .1rem);
 }
 

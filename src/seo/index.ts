@@ -13,7 +13,8 @@ export const resolveSiteUrl = (value: string | undefined): string | undefined =>
   }
 }
 
-const SITE_URL = resolveSiteUrl(import.meta.env.VITE_SITE_URL)
+const CANONICAL_SITE_URL = 'https://joaofortes.dev'
+const SITE_URL = CANONICAL_SITE_URL
 
 const routeKeys = {
   home: 'home',
@@ -70,19 +71,32 @@ export const setupSeoMetadata = (router: Router, configuredSiteUrl = SITE_URL): 
     setMeta('property', 'og:title', title)
     setMeta('property', 'og:description', description)
     setMeta('property', 'og:type', 'website')
+    setMeta('property', 'og:site_name', 'João Fortes')
     setMeta('property', 'og:locale', ogLocales[supportedLocale])
+    setMeta('property', 'og:image:width', '1200')
+    setMeta('property', 'og:image:height', '630')
+    setMeta('property', 'og:image:type', 'image/jpeg')
     setMeta('name', 'twitter:card', 'summary_large_image')
     setMeta('name', 'twitter:title', title)
     setMeta('name', 'twitter:description', description)
 
+    const isNotFound = routeName === 'not-found'
+    setMeta('name', 'robots', isNotFound ? 'noindex,follow' : 'index,follow')
+
     const siteUrl = resolveSiteUrl(configuredSiteUrl)
     if (siteUrl) {
       const pageUrl = new URL(route.path, `${siteUrl}/`).href
-      const imageUrl = new URL('/og-image.png', `${siteUrl}/`).href
-      setCanonical(pageUrl)
-      setMeta('property', 'og:url', pageUrl)
+      const imageUrl = new URL('/og-image.jpg', `${siteUrl}/`).href
       setMeta('property', 'og:image', imageUrl)
       setMeta('name', 'twitter:image', imageUrl)
+
+      if (isNotFound) {
+        removeElement('link[rel="canonical"]')
+        removeElement('meta[property="og:url"]')
+      } else {
+        setCanonical(pageUrl)
+        setMeta('property', 'og:url', pageUrl)
+      }
     } else {
       removeElement('link[rel="canonical"]')
       removeElement('meta[property="og:url"]')
