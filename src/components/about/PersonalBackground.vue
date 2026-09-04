@@ -2,8 +2,10 @@
 import { ref } from 'vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
 import TypedText from '@/components/ui/TypedText.vue'
+import { useI18n } from 'vue-i18n'
 
 const section = ref<HTMLElement | null>(null)
+const { t } = useI18n()
 
 defineExpose({
   getRevealElement: () => section.value ?? undefined,
@@ -12,19 +14,19 @@ defineExpose({
 
 <template>
   <section ref="section" aria-labelledby="personal-background-title">
-    <RetroWindow class="personal-background" title="background.log" close-label="Janela decorativa sobre minha trajetória">
+    <RetroWindow class="personal-background" title="background.log" :close-label="t('about.background.windowLabel')">
       <div class="terminal">
         <div class="terminal__toolbar" aria-hidden="true">
           <span>TERMINAL_02</span>
           <span>LOG · READ ONLY</span>
         </div>
         <p class="terminal__command"><span>joao@dev:~$</span> <TypedText text="cat life_before_code.txt" :delay="100" :speed="29" /></p>
-        <TypedText id="personal-background-title" class="terminal__title" tag="h2" text="Fora do código" :delay="750" :speed="27" />
+        <TypedText id="personal-background-title" class="terminal__title" tag="h2" :text="t('about.background.title')" :delay="750" :speed="27" />
         <div class="terminal__output">
-          <p><span>&gt;</span><TypedText text="Antes de dev, trabalhei em ambiente internacional de alta pressão a bordo de um cruzeiro." :delay="1250" :speed="13" /></p>
-          <p><span>&gt;</span><TypedText text="Atendimento ao cliente, comunicação com equipes multiculturais e adaptação rápida moldaram como lido com prazo e trabalho em equipe." :delay="2300" :speed="11" /></p>
+          <p><span>&gt;</span><TypedText :text="t('about.background.internationalWork')" :delay="1250" :speed="13" /></p>
+          <p><span>&gt;</span><TypedText :text="t('about.background.lessons')" :delay="2300" :speed="11" /></p>
         </div>
-        <p class="terminal__status"><i aria-hidden="true" /><TypedText text="EXPERIÊNCIA_CARREGADA" :delay="3650" :speed="21" /></p>
+        <p class="terminal__status"><i aria-hidden="true" /><TypedText :text="t('about.background.loaded')" :delay="3650" :speed="21" /></p>
       </div>
     </RetroWindow>
   </section>

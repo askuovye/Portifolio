@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { motion, useReducedMotion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
@@ -10,15 +11,17 @@ import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
 import { useGsapContext } from '@/composables/useGsapContext'
 import { projects } from '@/data/projects'
 
-const projectSummaries = projects.map(project => ({
+const projectSummaries = projects.slice(0, 4).map(project => ({
   id: project.id,
   name: project.title,
   image: project.image,
+  mediaType: project.mediaType,
   technologies: project.technologies,
 }))
 
 const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
+const { t } = useI18n()
 
 useGsapContext(section, ({ reducedMotion }) => {
   const title = section.value?.querySelector('.projects-section__title')  
@@ -62,7 +65,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 <template>
   <section ref="section" class="projects-section" aria-labelledby="home-projects-title">
     <div id="home-projects-title" class="projects-section__title">
-      <SectionTitle :level="2">PROJETOS</SectionTitle>
+      <SectionTitle :level="2">{{ t('home.projects.title') }}</SectionTitle>
     </div>
 
     <div class="projects-section__grid">
@@ -72,12 +75,23 @@ useGsapContext(section, ({ reducedMotion }) => {
         class="project-summary"
       >
         <h3 class="project-summary__accessible-title">{{ project.name }}</h3>
-        <RetroWindow :title="project.name" close-label="Fechar janela decorativa">
+        <RetroWindow :title="project.name" :close-label="t('home.projects.closeWindow')">
           <div class="project-summary__content">
             <div class="project-summary__screen">
-              <img
+              <video
+                v-if="project.mediaType === 'video'"
                 :src="project.image"
-                :alt="`Captura de tela do projeto ${project.name}`"
+                autoplay
+                loop
+                muted
+                playsinline
+                preload="metadata"
+                :aria-label="t('home.projects.animatedPreviewAlt', { project: project.name })"
+              />
+              <img
+                v-else
+                :src="project.image"
+                :alt="t('home.projects.previewAlt', { project: project.name })"
                 loading="lazy"
               >
               <span class="project-summary__scanlines" aria-hidden="true" />
@@ -85,7 +99,7 @@ useGsapContext(section, ({ reducedMotion }) => {
                 {{ String(index + 1).padStart(2, '0') }}
               </span>
             </div>
-            <ul aria-label="Tecnologias utilizadas">
+            <ul :aria-label="t('home.projects.technologiesLabel')">
               <li v-for="technology in project.technologies" :key="technology">
                 {{ technology }}
               </li>
@@ -102,7 +116,7 @@ useGsapContext(section, ({ reducedMotion }) => {
         :while-press="prefersReducedMotion ? undefined : { scale: .98 }"
         :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
       >
-        <RetroButton to="/projects" variant="primary" arrow>Ver projetos</RetroButton>
+        <RetroButton to="/projects" variant="primary" arrow>{{ t('home.projects.viewAll') }}</RetroButton>
       </motion.div>
     </div>
   </section>
@@ -160,7 +174,8 @@ useGsapContext(section, ({ reducedMotion }) => {
   background: #111;
 }
 
-.project-summary__screen img {
+.project-summary__screen img,
+.project-summary__screen video {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -168,7 +183,8 @@ useGsapContext(section, ({ reducedMotion }) => {
   transition: transform 300ms ease, filter 300ms ease;
 }
 
-.project-summary:hover .project-summary__screen img {
+.project-summary:hover .project-summary__screen img,
+.project-summary:hover .project-summary__screen video {
   transform: scale(1.05);
   filter: grayscale(0) contrast(1.08) brightness(.98);
 }

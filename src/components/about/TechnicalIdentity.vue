@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
-import hdVideo from '@/assets/animations/hd.mp4'
-import windowsImage from '@/assets/elements/windows.png'
+import hdVideo from '@/assets/animations/hd.webm'
+import windowsImage from '@/assets/elements/windows.webp'
 
 const { enter } = useEnterMotion(.7)
+const { t } = useI18n()
 const section = ref<HTMLElement | null>(null)
 const hdPlayer = ref<HTMLVideoElement | null>(null)
 const isDesktop = ref(false)
@@ -33,14 +35,14 @@ onBeforeUnmount(() => {
   <div class="technical-identity-shell">
     <section ref="section" class="technical-identity" aria-labelledby="technical-identity-title">
       <div class="technical-identity__content">
-        <motion.h3 id="technical-identity-title" v-bind="enter(0.08)">Identidade<br>Técnica</motion.h3>
-        <motion.p v-bind="enter(0.16)">Construo aplicações full stack com Laravel e Vue, mas também gosto de mexer onde a maioria não vai — de matemática de câmera 3D em jogos até debugar driver de kernel no Linux quando a solução óbvia não existe.</motion.p>
+        <motion.h3 id="technical-identity-title" v-bind="enter(0.08)">{{ t('about.identity.titleFirst') }}<br>{{ t('about.identity.titleSecond') }}</motion.h3>
+        <motion.p v-bind="enter(0.16)">{{ t('about.identity.description') }}</motion.p>
       </div>
     </section>
     <video
       v-if="isDesktop"
       ref="hdPlayer"
-      class="technical-identity__hd"
+      class="technical-identity__hd decorative-video-edge-fade"
       :src="hdVideo"
       muted
       loop

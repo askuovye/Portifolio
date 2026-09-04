@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Icon } from '@iconify/vue'
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 interface ContactChannel {
@@ -19,11 +20,12 @@ const channels: ContactChannel[] = [
 ]
 
 const { enter } = useEnterMotion(.44)
+const { t } = useI18n()
 </script>
 
 <template>
   <div class="contact-info">
-    <h2 id="contact-channels-title" class="sr-only">Canais de contato</h2>
+    <h2 id="contact-channels-title" class="sr-only">{{ t('contact.channels.title') }}</h2>
     <ol aria-labelledby="contact-channels-title">
       <motion.li
         v-for="(channel, index) in channels"
@@ -40,7 +42,7 @@ const { enter } = useEnterMotion(.44)
             <Icon :icon="channel.icon" aria-hidden="true" />
             {{ channel.label }}
           </span>
-          <span class="contact-info__action">Abrir canal</span>
+          <span class="contact-info__action">{{ t('contact.channels.open') }}</span>
           <span class="contact-info__arrow" aria-hidden="true">→</span>
         </a>
       </motion.li>

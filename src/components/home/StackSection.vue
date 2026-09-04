@@ -2,10 +2,11 @@
 import { ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import SectionTitle from '@/components/ui/SectionTitle.vue'
-import stickerImage from '@/assets/elements/sticker.png'
-import stickerFrame2 from '@/assets/elements/sticker-frame-2.png'
-import stickerFrame3 from '@/assets/elements/sticker-frame-3.png'
+import stickerImage from '@/assets/elements/sticker.webp'
+import stickerFrame2 from '@/assets/elements/sticker-frame-2.webp'
+import stickerFrame3 from '@/assets/elements/sticker-frame-3.webp'
 import { stackGroups } from '@/data/stack'
 import { gsap } from '@/animations/gsap'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
@@ -13,6 +14,7 @@ import { useGsapContext } from '@/composables/useGsapContext'
 
 const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
+const { t } = useI18n()
 
 const cardVariants = {
   rest: { y: 0, scale: 1 },
@@ -22,13 +24,6 @@ const cardVariants = {
 const iconVariants = {
   rest: { rotate: 0 },
   hover: { rotate: -4 },
-}
-
-const groupLabels: Record<string, string> = {
-  frontend: 'frontend',
-  backend: 'backend',
-  database: 'database',
-  tooling: 'Ferramentas',
 }
 
 useGsapContext(section, ({ reducedMotion }) => {
@@ -67,7 +62,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 <template>
   <section ref="section" class="stack" aria-labelledby="stack-title">
     <div id="stack-title" class="stack__title">
-      <SectionTitle :level="2">Minha Stack</SectionTitle>
+      <SectionTitle :level="2">{{ t('home.stack.title') }}</SectionTitle>
     </div>
 
     <div class="stack__grid">
@@ -93,7 +88,7 @@ useGsapContext(section, ({ reducedMotion }) => {
 
           <div class="stack-card__content">
             <div class="stack-card__meta">
-              <span>{{ groupLabels[group.id] }}</span>
+              <span>{{ t(`home.stack.groups.${group.id}`) }}</span>
               <span aria-hidden="true">{{ String(index + 1).padStart(2, '0') }} / {{ String(stackGroups.length).padStart(2, '0') }}</span>
             </div>
 

@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
-import devSticker from '@/assets/elements/dev-sticker.png'
+import { useI18n } from 'vue-i18n'
+import devSticker from '@/assets/elements/dev-sticker.webp'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 const { enter } = useEnterMotion(.52)
+const { t } = useI18n()
 </script>
 
 <template>
   <motion.figure class="contact-visual" v-bind="enter(.18, { rotate: 2 })">
     <img
       :src="devSticker"
-      alt="Disquete estilizado com a inscrição .dev, ideia mais código e impacto real"
+      :alt="t('contact.visual.alt')"
     >
   </motion.figure>
 </template>

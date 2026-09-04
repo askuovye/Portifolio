@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 
 const { enter } = useEnterMotion(.44)
+const { t } = useI18n()
 </script>
 
 <template>
   <motion.div class="availability" v-bind="enter(.28)">
-    <p class="availability__status"><span aria-hidden="true" /> Disponível</p>
-    <p>Brasil / GMT−3</p>
-    <p>Freelance / Trabalho remoto</p>
+    <p class="availability__status"><span aria-hidden="true" /> {{ t('contact.availability.status') }}</p>
+    <p>{{ t('contact.availability.location') }} / GMT−3</p>
+    <p>{{ t('contact.availability.workMode') }}</p>
   </motion.div>
 </template>
 

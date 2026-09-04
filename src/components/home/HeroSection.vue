@@ -2,20 +2,22 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import RetroButton from '@/components/ui/RetroButton.vue'
 import RetroWindow from '@/components/ui/RetroWindow.vue'
-import profileImage from '@/assets/profile-joao.jpeg'
-import cursorImage from '@/assets/elements/cursor.png'
-import devmodeBadge from '@/assets/elements/devmode-badge.png'
-import barCode from '@/assets/elements/barcode.png'
-import heroBadge from '@/assets/elements/hero-badge.png'
-import paperImage from '@/assets/elements/paper.png'
+import profileImage from '@/assets/photos/profile-joao.webp'
+import cursorImage from '@/assets/elements/cursor.webp'
+import devmodeBadge from '@/assets/elements/devmode-badge.webp'
+import barCode from '@/assets/elements/barcode.webp'
+import heroBadge from '@/assets/elements/hero-badge.webp'
+import paperImage from '@/assets/elements/paper.webp'
 import chainsVideo from '@/assets/animations/chains.mp4'
 import { gsap } from '@/animations/gsap'
 import { useGsapContext } from '@/composables/useGsapContext'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const prefersReducedMotion = useReducedMotion()
+const { t } = useI18n()
 const hero = ref<HTMLElement | null>(null)
 const profileWindow = ref<HTMLElement | null>(null)
 const profileImageReveal = ref<HTMLElement | null>(null)
@@ -81,17 +83,17 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
 
 <template>
   <section ref="hero" class="hero" aria-labelledby="hero-title">
-    <span class="hero__accessible-name">Opa! João aqui.</span>
+    <span class="hero__accessible-name">{{ t('home.hero.accessibleName') }}</span>
     <div class="hero__content">
-      <motion.p class="hero__hello" v-bind="enter(0.05)">Opa!</motion.p>
+      <motion.p class="hero__hello" v-bind="enter(0.05)">{{ t('home.hero.greeting') }}</motion.p>
       <motion.h1 id="hero-title" class="hero__title" v-bind="enter(0.38)">
-        João aqui.<span class="hero__wave" aria-hidden="true">👋</span>
+        {{ t('home.hero.title') }}<span class="hero__wave" aria-hidden="true">👋</span>
       </motion.h1>
-      <motion.p class="hero__role" v-bind="enter(0.24)">ENGENHEIRO DE SOFTWARE<br><span>— BRASIL 🇧🇷 —</span></motion.p>
-      <motion.p class="hero__description" v-bind="enter(0.32)">Eu crio sites dinâmicos, estéticos<br class="desktop-only"> e altamente funcionais.</motion.p>
+      <motion.p class="hero__role" v-bind="enter(0.24)">{{ t('home.hero.role') }}<br><span>— {{ t('home.hero.country') }} 🇧🇷 —</span></motion.p>
+      <motion.p class="hero__description" v-bind="enter(0.32)">{{ t('home.hero.descriptionFirst') }}<br class="desktop-only"> {{ t('home.hero.descriptionSecond') }}</motion.p>
       <motion.div class="hero__actions" v-bind="enter(0.4)">
-        <RetroButton to="/projects" variant="primary" arrow>Ver projetos</RetroButton>
-        <RetroButton to="/contact" variant="secondary" mail>Entre em contato</RetroButton>
+        <RetroButton to="/projects" variant="primary" arrow>{{ t('home.hero.projectsCta') }}</RetroButton>
+        <RetroButton to="/contact" variant="secondary" mail>{{ t('home.hero.contactCta') }}</RetroButton>
       </motion.div>
     </div>
 
@@ -100,17 +102,17 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
       <div ref="profileWindow" class="portrait-window">
         <RetroWindow title="joao.dev - profile.exe" class="profile-window">
           <div ref="profileImageReveal" class="portrait-frame">
-            <img :src="profileImage" alt="Retrato em preto e branco de João" width="1024" height="1365">
+            <img :src="profileImage" :alt="t('home.hero.portraitAlt')" width="1024" height="1365">
             <div class="portrait-frame__halftone" aria-hidden="true" />
           </div>
         </RetroWindow>
       </div>
-      <motion.img class="portrait-badge" :src="heroBadge" alt="Fullstack developer"/>
+      <motion.img class="portrait-badge" :src="heroBadge" :alt="t('home.hero.fullstackBadgeAlt')"/>
       <motion.img class="portrait-cursor" :src="cursorImage" alt="" aria-hidden="true" v-bind="enter(0.76, { y: 8, rotate: -7 })" />
     </div>
-    <motion.img class="devmode-badge deco" :src="devmodeBadge" alt="Dev mode — sistemas online"/>
-    <motion.aside class="coordinates deco" aria-label="Localização" v-bind="enter(0.78)">
-      <span class="coordinates__globe"><Icon class="retro-window__close-icon" icon="iconoir:www" /></span><span>−23.5505° S<br>−46.6333° W</span><strong>BRASIL</strong>
+    <motion.img class="devmode-badge deco" :src="devmodeBadge" :alt="t('home.hero.devModeAlt')"/>
+    <motion.aside class="coordinates deco" :aria-label="t('home.hero.locationLabel')" v-bind="enter(0.78)">
+      <span class="coordinates__globe"><Icon class="retro-window__close-icon" icon="iconoir:www" /></span><span>−23.5505° S<br>−46.6333° W</span><strong>{{ t('home.hero.country') }}</strong>
     </motion.aside>
     <motion.div class="vertical-note deco">DESIGN + CODE + CREATE</motion.div>
     <motion.img class="barcode" :src="barCode" alt="one of a kind"/>
@@ -118,6 +120,7 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
     <div v-if="isDesktop && !prefersReducedMotion" ref="chains" class="hero__chains" aria-hidden="true">
       <video
         ref="chainsPlayer"
+        class="decorative-video-edge-fade"
         :src="chainsVideo"
         muted
         loop
@@ -207,7 +210,7 @@ const enter = (delay: number, extra: Record<string, number | string> = {}) => ({
   .hero { display: flex; flex-direction: column; gap: 2rem; padding: 2.5rem 0 5rem; overflow: hidden; }
   .hero__content { width: 100%; }
   .hero__hello { font-size: clamp(3.5rem, 20vw, 5rem); }
-  .hero__title { font-size: clamp(4rem, 22vw, 6rem); white-space: normal; }
+  .hero__title { width: 100%; max-width: 100%; font-size: clamp(4rem, 22vw, 6rem); white-space: normal; }
   .hero__role { margin-top: 1.1rem; }
   .hero__portrait { position: relative; top: auto; right: auto; width: calc(100% - 2rem); margin-left: 1rem; }
   .portrait-frame { height: min(118vw, 34rem); }

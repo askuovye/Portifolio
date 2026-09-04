@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Icon } from '@iconify/vue'
 import { motion, useReducedMotion } from 'motion-v'
 import RetroButton from '@/components/ui/RetroButton.vue'
@@ -19,13 +20,14 @@ interface ContactChannel {
 }
 
 const isExternalLink = (href: string) => /^https?:\/\//i.test(href)
+const { t } = useI18n()
 
-const channels: ContactChannel[] = [
+const channels = computed<ContactChannel[]>(() => [
   { label: 'Email', detail: 'john.lopes.fortes@gmail.com', icon: 'mdi:email-outline', href: 'mailto:john.lopes.fortes@gmail.com' },
-  { label: 'LinkedIn', detail: 'Conexões profissionais', icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/joaolopesfortes/' },
-  { label: 'GitHub', detail: 'Código e projetos', icon: 'mdi:github', href: 'https://github.com/askuovye' },
+  { label: 'LinkedIn', detail: t('home.contact.channels.linkedin'), icon: 'mdi:linkedin', href: 'https://www.linkedin.com/in/joaolopesfortes/' },
+  { label: 'GitHub', detail: t('home.contact.channels.github'), icon: 'mdi:github', href: 'https://github.com/askuovye' },
   { label: 'WhatsApp', detail: '42984431307', icon: 'mdi:whatsapp', href: 'https://wa.me/+5542984431307' },
-]
+])
 
 const section = ref<HTMLElement | null>(null)
 const prefersReducedMotion = useReducedMotion()
@@ -96,27 +98,27 @@ useGsapContext(section, ({ reducedMotion }) => {
   <section ref="section" class="contact" aria-labelledby="contact-title">
     <div class="contact__heading">
       <div>
-        <SectionTitle id="contact-title" :level="2">Vamos conversar?</SectionTitle>
+        <SectionTitle id="contact-title" :level="2">{{ t('home.contact.title') }}</SectionTitle>
       </div>
       <div class="contact__status" role="status">
         <span aria-hidden="true" />
-        Disponível para freelances e oportunidades remotas
+        {{ t('home.contact.availability') }}
       </div>
     </div>
 
     <div class="contact__layout">
-      <RetroWindow class="contact__window" title="new_message.exe" close-label="Janela de nova mensagem">
+      <RetroWindow class="contact__window" title="new_message.exe" :close-label="t('home.contact.windowLabel')">
         <div class="contact__message">
           <p class="contact__prompt" aria-hidden="true">C:\JOAO\CONTACT&gt; <span>_</span></p>
-          <h4>Tem um projeto em mente ou uma oportunidade?</h4>
-          <p class="contact__copy">Conte um pouco sobre o desafio. Estou aberto a construir produtos, colaborar com equipes e transformar boas ideias em experiências digitais funcionais.</p>
+          <h4>{{ t('home.contact.heading') }}</h4>
+          <p class="contact__copy">{{ t('home.contact.description') }}</p>
 
           <div class="contact__meta">
             <span><Icon icon="mdi:map-marker-outline" aria-hidden="true" /> Pato Branco, PR</span>
             <span><Icon icon="mdi:clock-outline" aria-hidden="true" /> GMT−3 · Brasília</span>
           </div>
 
-          <p class="contact__channels-title">// CANAIS_DISPONÍVEIS</p>
+          <p class="contact__channels-title">// {{ t('home.contact.channelsTitle') }}</p>
           <motion.a
             v-for="(channel, index) in channels"
             :key="channel.label"
@@ -142,7 +144,7 @@ useGsapContext(section, ({ reducedMotion }) => {
         <video
           v-if="isDesktop"
           ref="worldPlayer"
-          class="contact__world"
+          class="contact__world decorative-video-edge-fade"
           :src="worldVideo"
           muted
           loop
@@ -155,7 +157,7 @@ useGsapContext(section, ({ reducedMotion }) => {
     <div class="contact__ticker" aria-hidden="true">
       <span>DESIGN + CODE + CREATE</span>
       <span>●</span>
-      <span>VAMOS CONSTRUIR ALGO JUNTOS</span>
+      <span>{{ t('home.contact.ticker') }}</span>
       <span>●</span>
       <span>OPEN TO WORK</span>
     </div>

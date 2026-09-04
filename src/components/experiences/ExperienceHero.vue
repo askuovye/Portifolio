@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import kuromiVideo from '@/assets/animations/kuromi.mp4'
-import barcodeSmileyImage from '@/assets/elements/barcode-smiley.png'
+import barcodeSmileyImage from '@/assets/elements/barcode-smiley.webp'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const hero = ref<HTMLElement | null>(null)
+const { t } = useI18n()
 const kuromiPlayer = ref<HTMLVideoElement | null>(null)
 useDecorativeVideo(kuromiPlayer, { target: hero, threshold: .08 })
 </script>
@@ -12,23 +14,22 @@ useDecorativeVideo(kuromiPlayer, { target: hero, threshold: .08 })
 <template>
   <section ref="hero" class="experience-hero" aria-labelledby="experience-title">
     <div class="experience-hero__meta">
-      <span>ARQUIVO_02</span>
-      <span>CARREIRA.LOG</span>
+      <span>{{ t('experiences.hero.file') }}</span>
+      <span>{{ t('experiences.hero.careerLog') }}</span>
     </div>
     <div class="experience-hero__copy">
-      <h1 id="experience-title">Experiência</h1>
+      <h1 id="experience-title">{{ t('experiences.hero.title') }}</h1>
       <p class="experience-hero__intro">
-        Uma carreira construída entre tecnologia, atendimento e resolução de problemas —
-        transformando experiências diferentes em repertório para criar soluções melhores.
+        {{ t('experiences.hero.description') }}
       </p>
     </div>
-    <div class="experience-hero__status" aria-label="Status profissional">
+    <div class="experience-hero__status" :aria-label="t('experiences.hero.statusLabel')">
       <span class="experience-hero__pulse" aria-hidden="true" />
-      <span>DISPONÍVEL PARA NOVOS DESAFIOS</span>
+      <span>{{ t('experiences.hero.availability') }}</span>
     </div>
     <video
       ref="kuromiPlayer"
-      class="experience-hero__kuromi"
+      class="experience-hero__kuromi decorative-video-edge-fade"
       :src="kuromiVideo"
       muted
       loop
@@ -115,6 +116,11 @@ h1 {
 }
 
 .experience-hero__kuromi {
+  --video-fade-left: 18%;
+  --video-fade-right: 18%;
+  --video-fade-top: 4%;
+  --video-fade-bottom: 8%;
+
   position: absolute;
   z-index: 1;
   top: clamp(3.5rem, 7vw, 6rem);
@@ -155,10 +161,17 @@ h1 {
 
 @media (max-width: 48rem) {
   .experience-hero { min-height: 28rem; }
+  .experience-hero__meta,
+  .experience-hero__copy { width: 100%; min-width: 0; max-width: 100%; }
   .experience-hero__copy { gap: 1.5rem; }
+  .experience-hero__copy h1 { font-size: min(4rem, 12.2vw); }
   .experience-hero__intro { max-width: 28rem; }
   .experience-hero__status { left: 1rem; right: auto; }
   .experience-hero__kuromi { top: 4.25rem; right: 1rem; width: 13.18rem; height: 13.18rem; }
   .experience-hero__barcode { bottom: -.5rem; width: 12.6rem; }
+}
+@media (max-width: 30rem) {
+  .experience-hero__kuromi,
+  .experience-hero__barcode { display: none; }
 }
 </style>

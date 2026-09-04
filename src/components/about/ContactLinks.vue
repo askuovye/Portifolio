@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { Icon } from '@iconify/vue'
 import { motion } from 'motion-v'
 import { RouterLink } from 'vue-router'
-import tamagochiVideo from '@/assets/animations/tamagochi.mp4'
+import { useI18n } from 'vue-i18n'
+import tamagochiVideo from '@/assets/animations/tamagochi.webm'
 import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
-import globeImage from '@/assets/elements/globe.jpg'
+import globeImage from '@/assets/elements/globe.webp'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const { enter } = useEnterMotion(.7)
+const { t } = useI18n()
 const section = ref<HTMLElement | null>(null)
 const tamagochiPlayer = ref<HTMLVideoElement | null>(null)
 const chainsPlayer = ref<HTMLVideoElement | null>(null)
@@ -42,16 +44,16 @@ interface ContactLink {
   available?: boolean
 }
 
-const links: ContactLink[] = [
+const links = computed<ContactLink[]>(() => [
   {
     label: 'LinkedIn',
-    detail: 'Conexões profissionais',
+    detail: t('about.contact.links.linkedin'),
     icon: 'mdi:linkedin',
     href: 'https://www.linkedin.com/in/joaolopesfortes/',
   },
   {
     label: 'GitHub',
-    detail: 'Código e projetos',
+    detail: t('about.contact.links.github'),
     icon: 'mdi:github',
     href: 'https://github.com/askuovye',
   },
@@ -68,12 +70,12 @@ const links: ContactLink[] = [
     href: 'https://wa.me/+5542984431307',
   },
   {
-    label: 'Currículo',
-    detail: 'Baixar PDF',
+    label: t('about.contact.links.resumeLabel'),
+    detail: t('about.contact.links.resumeDetail'),
     icon: 'mdi:file-document-outline',
     href: '/resume/joao-fortes-pt-BR.pdf',
   },
-]
+])
 </script>
 
 <template>
@@ -81,6 +83,7 @@ const links: ContactLink[] = [
     <div v-if="isDesktop" class="contact-links__chains" aria-hidden="true">
       <video
         ref="chainsPlayer"
+        class="decorative-video-edge-fade"
         :src="chainsHorizontalVideo"
         muted
         loop
@@ -92,8 +95,8 @@ const links: ContactLink[] = [
     <div class="contact-links">
       <div class="contact-links__heading">
         <motion.p v-bind="enter(0.05)">// CONTACT_DIRECTORY</motion.p>
-        <motion.h2 id="contact-links-title" v-bind="enter(0.12)">Onde me<br><span>achar?</span></motion.h2>
-        <motion.p class="contact-links__intro" v-bind="enter(0.2)">Aberto a projetos, colaborações e boas conversas sobre tecnologia.</motion.p>
+        <motion.h2 id="contact-links-title" v-bind="enter(0.12)">{{ t('about.contact.titleFirst') }}<br><span>{{ t('about.contact.titleSecond') }}</span></motion.h2>
+        <motion.p class="contact-links__intro" v-bind="enter(0.2)">{{ t('about.contact.description') }}</motion.p>
       </div>
 
       <ol class="contact-links__list">
@@ -123,7 +126,7 @@ const links: ContactLink[] = [
       <video
         v-if="isDesktop"
         ref="tamagochiPlayer"
-        class="contact-links__tamagochi"
+        class="contact-links__tamagochi decorative-video-edge-fade"
         :src="tamagochiVideo"
         muted
         loop
@@ -191,16 +194,17 @@ const links: ContactLink[] = [
 }
 
 .contact-links__tamagochi {
+  --video-fade-left: 8%;
+  --video-fade-right: 16%;
+  --video-fade-top: 4%;
+  --video-fade-bottom: 18%;
+
   position: absolute;
-  z-index: 2;
+  z-index: 0;
   top: 17%;
   left: 40%;
   width: clamp(12rem, 27vw, 9rem);
   height: auto;
-  -webkit-mask-image: radial-gradient(ellipse at center, #000 30%, rgb(0 0 0 / 80%) 48%, rgb(0 0 0 / 35%) 68%, transparent 88%);
-  mask-image: radial-gradient(ellipse at center, #000 30%, rgb(0 0 0 / 80%) 48%, rgb(0 0 0 / 35%) 68%, transparent 88%);
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
   transform: translate(-50%, -50%);
   pointer-events: none;
 }

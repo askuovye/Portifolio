@@ -1,25 +1,28 @@
 <script setup lang="ts">
 import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { AnimatePresence, motion, useReducedMotion } from 'motion-v'
 import { interactionSpring, reducedMotionTransition } from '@/animations/motion'
 import PageLoader from '@/components/ui/PageLoader.vue'
 import { usePageLoader } from '@/composables/usePageLoader'
+import { setLocale, type SupportedLocale } from '@/i18n'
 
 interface NavigationItem {
-  label: string
+  labelKey: string
   to: string
 }
 
 const navigation: NavigationItem[] = [
-  { label: 'Home', to: '/' },
-  { label: 'Sobre', to: '/about' },
-  { label: 'Projetos', to: '/projects' },
-  { label: 'Experiências', to: '/experiences' },
-  { label: 'Contato', to: '/contact' },
+  { labelKey: 'navigation.home', to: '/' },
+  { labelKey: 'navigation.about', to: '/about' },
+  { labelKey: 'navigation.projects', to: '/projects' },
+  { labelKey: 'navigation.experiences', to: '/experiences' },
+  { labelKey: 'navigation.contact', to: '/contact' },
 ]
 
 const route = useRoute()
+const { locale, t } = useI18n()
 const isMenuOpen = ref(false)
 const prefersReducedMotion = useReducedMotion()
 const pageLoader = usePageLoader()
@@ -30,6 +33,10 @@ const closeMenu = () => {
 
 const toggleMenu = () => {
   isMenuOpen.value = !isMenuOpen.value
+}
+
+const changeLocale = (nextLocale: SupportedLocale) => {
+  setLocale(nextLocale)
 }
 
 const handleEscape = (event: KeyboardEvent) => {
@@ -78,15 +85,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
 
 <template>
   <PageLoader />
-  <a class="skip-link" href="#main-content">Pular para o conteúdo</a>
+  <a class="skip-link" href="#main-content">{{ t('accessibility.skipToContent') }}</a>
 
   <div class="site-shell">
     <header class="site-header">
-      <RouterLink class="site-logo" to="/" aria-label="JOAO.DEV — página inicial">
+      <RouterLink class="site-logo" to="/" :aria-label="t('accessibility.homeLink')">
         <span aria-hidden="true">//</span> JOAO.DEV
       </RouterLink>
 
-      <nav class="desktop-nav" aria-label="Navegação principal">
+      <nav class="desktop-nav" :aria-label="t('accessibility.primaryNavigation')">
         <motion.div
           v-for="item in navigation"
           :key="item.to"
@@ -95,22 +102,28 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
           :while-press="prefersReducedMotion ? undefined : { y: 1 }"
           :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
         >
-          <RouterLink :to="item.to">{{ item.label }}</RouterLink>
+          <RouterLink :to="item.to">{{ t(item.labelKey) }}</RouterLink>
         </motion.div>
       </nav>
+
+      <div class="language-switcher" role="group" :aria-label="t('language.label')">
+        <button type="button" :aria-pressed="locale === 'pt-BR'" @click="changeLocale('pt-BR')">PT</button>
+        <span aria-hidden="true">/</span>
+        <button type="button" :aria-pressed="locale === 'en'" @click="changeLocale('en')">EN</button>
+      </div>
 
       <motion.button
         class="menu-trigger"
         type="button"
         aria-controls="mobile-navigation"
         :aria-expanded="isMenuOpen"
-        :aria-label="isMenuOpen ? 'Fechar menu' : 'Abrir menu'"
+        :aria-label="isMenuOpen ? t('accessibility.closeMenu') : t('accessibility.openMenu')"
         :while-hover="prefersReducedMotion ? undefined : { scale: 1.04 }"
         :while-press="prefersReducedMotion ? undefined : { scale: 0.96 }"
         :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
         @click="toggleMenu"
       >
-        [ {{ isMenuOpen ? 'FECHAR' : 'MENU' }} ]
+        [ {{ isMenuOpen ? t('menu.close') : t('menu.open') }} ]
       </motion.button>
 
       <AnimatePresence>
@@ -118,7 +131,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
           v-if="isMenuOpen"
           id="mobile-navigation"
           class="mobile-nav"
-          aria-label="Navegação móvel"
+          :aria-label="t('accessibility.mobileNavigation')"
           :initial="prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }"
           :animate="{ opacity: 1, y: 0 }"
           :exit="prefersReducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }"
@@ -132,7 +145,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
             :while-press="prefersReducedMotion ? undefined : { x: 2 }"
             :transition="prefersReducedMotion ? reducedMotionTransition : interactionSpring"
           >
-            <RouterLink :to="item.to" @click="closeMenu">{{ item.label }}</RouterLink>
+            <RouterLink :to="item.to" @click="closeMenu">{{ t(item.labelKey) }}</RouterLink>
           </motion.div>
         </motion.nav>
       </AnimatePresence>
@@ -163,11 +176,37 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
   z-index: $z-header;
   top: 0;
   display: grid;
-  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 2fr);
+  grid-template-columns: minmax(12rem, 0.8fr) minmax(0, 2fr) auto;
   width: min(calc(100% - (2 * var(--site-gutter))), $container-max);
   margin-inline: auto;
   border: 1px solid var(--border);
   background: rgb(3 3 3 / 96%);
+}
+
+.language-switcher {
+  display: flex;
+  align-items: center;
+  min-height: 3.5rem;
+  padding-inline: .85rem;
+  border-left: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: .68rem;
+}
+
+.language-switcher button {
+  min-width: 2rem;
+  min-height: 2rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.language-switcher button:hover,
+.language-switcher button[aria-pressed='true'] {
+  color: var(--accent-bright);
 }
 
 .site-logo {
@@ -240,7 +279,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
 
 @include breakpoint-down($breakpoint-tablet) {
   .site-header {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
   }
 
   .desktop-nav {
@@ -296,6 +335,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', handleEscape))
   .site-logo {
     min-height: 3.25rem;
     padding-inline: 0.8rem;
+  }
+
+  .language-switcher {
+    min-height: 3.25rem;
+    padding-inline: .35rem;
+  }
+
+  .language-switcher button {
+    min-width: 1.75rem;
   }
 
   .site-footer {

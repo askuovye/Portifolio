@@ -1,26 +1,35 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { motion } from 'motion-v'
+import { useI18n } from 'vue-i18n'
 import FakeCaptcha from './FakeCaptcha.vue'
 import { useEnterMotion } from '@/composables/useEnterMotion'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 import chainsHorizontalVideo from '@/assets/animations/chains-horizontal.mp4'
-import doubleGlobeImage from '@/assets/elements/double-globe.jpg'
-import legoSkeletonImage from '@/assets/elements/lego-skeleton.png'
-import profileImage from '@/assets/profile-joao.jpeg'
-import chatbotImage from '@/assets/elements/chatbot.jpeg'
+import doubleGlobeImage from '@/assets/elements/double-globe.webp'
+import legoSkeletonImage from '@/assets/elements/lego-skeleton.webp'
+import captcha1Image from '@/assets/photos/captcha1.webp'
+import captcha2Image from '@/assets/photos/captcha2.webp'
+import captcha3Image from '@/assets/photos/captcha3.webp'
+import captcha4Image from '@/assets/photos/captcha4.webp'
+import captcha5Image from '@/assets/photos/captcha5.webp'
+import captcha6Image from '@/assets/photos/captcha6.webp'
+import captcha7Image from '@/assets/photos/captcha7.webp'
+import captcha8Image from '@/assets/photos/captcha8.webp'
+import captchaCenterImage from '@/assets/photos/center-image.webp'
 
 const { enter } = useEnterMotion(.7)
+const { t } = useI18n()
 const captchaImages = [
-  { src: profileImage, position: 'center 12%' },
-  { src: chatbotImage, position: 'center 32%' },
-  { src: profileImage, position: 'center 55%' },
-  { src: profileImage, position: 'left 22%' },
-  { src: chatbotImage, position: 'center 45%' },
-  { src: profileImage, position: 'right 28%' },
-  { src: profileImage, position: 'left 70%' },
-  { src: chatbotImage, position: 'center 78%' },
-  { src: profileImage, position: 'right 68%' },
+  { src: captcha1Image },
+  { src: captcha2Image },
+  { src: captcha3Image },
+  { src: captcha4Image },
+  { src: captchaCenterImage },
+  { src: captcha5Image },
+  { src: captcha6Image },
+  { src: captcha7Image },
+  { src: captcha8Image },
 ]
 const section = ref<HTMLElement | null>(null)
 const captcha = ref<InstanceType<typeof FakeCaptcha> | null>(null)
@@ -54,8 +63,8 @@ onBeforeUnmount(() => {
     <div class="about-intro__copy">
       <motion.p class="about-intro__eyebrow" v-bind="enter(0.05)">// ABOUT_ME.TXT</motion.p>
       <motion.h1 id="about-title" v-bind="enter(0.38)">João<br><span>Fortes</span></motion.h1>
-      <motion.p class="about-intro__role" v-bind="enter(0.2)">Desenvolvedor Full Stack — Laravel & Vue.js</motion.p>
-      <motion.p class="about-intro__description" v-bind="enter(0.28)">Construindo do banco de dados à interface. Graduando em Engenharia de Software em Guarapuava, PR.</motion.p>
+      <motion.p class="about-intro__role" v-bind="enter(0.2)">{{ t('about.hero.role') }}</motion.p>
+      <motion.p class="about-intro__description" v-bind="enter(0.28)">{{ t('about.hero.description') }}</motion.p>
     </div>
     <FakeCaptcha ref="captcha" class="captcha" :images="captchaImages" />
     <img class="about-intro__double-globe" :src="doubleGlobeImage" alt="" aria-hidden="true">
@@ -63,6 +72,7 @@ onBeforeUnmount(() => {
     <div v-if="isDesktop" class="about-intro__chains" aria-hidden="true">
       <video
         ref="chainsPlayer"
+        class="decorative-video-edge-fade"
         :src="chainsHorizontalVideo"
         muted
         loop
@@ -143,6 +153,7 @@ onBeforeUnmount(() => {
 
 .about-intro__copy {
   width: 100%;
+  min-width: 0;
   max-width: 43rem;
   padding-block: clamp(1rem, 3vw, 2.5rem);
 }
@@ -200,7 +211,7 @@ h1 span {
 
 @media (max-width: 38rem) {
   .about-intro { min-height: auto; padding-block: 4rem; }
-  h1 { font-size: clamp(5rem, 27vw, 8rem); }
+  h1 { font-size: clamp(4.5rem, 20.5vw, 8rem); }
   .about-intro__role { margin-top: 3rem; }
   .about-intro__chains { display: none; }
   .about-intro__double-globe { display: none; }

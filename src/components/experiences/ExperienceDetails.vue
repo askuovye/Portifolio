@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import CertificationsSection from './CertificationsSection.vue'
 import EducationSection from './EducationSection.vue'
-import strawberryVideo from '@/assets/animations/stawberry.mp4'
+import strawberryVideo from '@/assets/animations/stawberry.webm'
 import { useDecorativeVideo } from '@/composables/useDecorativeVideo'
 
 const strawberryPlayer = ref<HTMLVideoElement | null>(null)
@@ -14,7 +14,7 @@ useDecorativeVideo(strawberryPlayer, { threshold: .08 })
     <EducationSection />
     <video
       ref="strawberryPlayer"
-      class="experience-details__strawberry"
+      class="experience-details__strawberry decorative-video-edge-fade"
       :src="strawberryVideo"
       muted
       loop
@@ -36,7 +36,14 @@ useDecorativeVideo(strawberryPlayer, { threshold: .08 })
   margin-top: clamp(4rem, 8vw, 8rem);
 }
 
+.experience-details > * { min-width: 0; }
+
 .experience-details__strawberry {
+  --video-fade-left: 14%;
+  --video-fade-right: 14%;
+  --video-fade-top: 14%;
+  --video-fade-bottom: 10%;
+
   position: absolute;
   z-index: 2;
   top: clamp(2.25rem, 4vw, 3.5rem);
@@ -65,6 +72,9 @@ useDecorativeVideo(strawberryPlayer, { threshold: .08 })
     width: clamp(4.5rem, 18vw, 6rem);
     translate: 0 -50%;
   }
+}
+@media (max-width: 30rem) {
+  .experience-details__strawberry { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {

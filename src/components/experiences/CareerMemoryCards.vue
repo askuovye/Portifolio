@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { CareerExperience } from '@/data/experiences'
 import CareerMemoryCard from './CareerMemoryCard.vue'
 
@@ -12,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [id: string]
 }>()
+const { t } = useI18n()
 
 const activeIndex = computed(() => {
   const index = props.experiences.findIndex(experience => experience.id === props.selectedId)
@@ -67,13 +69,13 @@ const navigate = (index: number, direction: -1 | 1) => {
 </script>
 
 <template>
-  <div class="career-memory" role="group" aria-label="Career Memory Cards">
+  <div class="career-memory" role="group" :aria-label="t('experiences.memoryCards.groupLabel')">
     <div class="career-memory__label">
-      <span>// PHYSICAL MEMORY</span>
-      <span>SELECT SAVE FILE</span>
+      <span>// {{ t('experiences.memoryCards.physicalMemory') }}</span>
+      <span>{{ t('experiences.memoryCards.selectSave') }}</span>
     </div>
     <div class="career-memory-carousel">
-      <button class="career-memory-carousel__arrow career-memory-carousel__arrow--previous" type="button" aria-label="Experiência anterior" @click="previousExperience">
+      <button class="career-memory-carousel__arrow career-memory-carousel__arrow--previous" type="button" :aria-label="t('experiences.memoryCards.previous')" @click="previousExperience">
         <span aria-hidden="true">◀</span>
       </button>
       <div class="career-memory-carousel__viewport">
@@ -97,11 +99,11 @@ const navigate = (index: number, direction: -1 | 1) => {
           </div>
         </div>
       </div>
-      <button class="career-memory-carousel__arrow career-memory-carousel__arrow--next" type="button" aria-label="Próxima experiência" @click="nextExperience">
+      <button class="career-memory-carousel__arrow career-memory-carousel__arrow--next" type="button" :aria-label="t('experiences.memoryCards.next')" @click="nextExperience">
         <span aria-hidden="true">▶</span>
       </button>
     </div>
-    <p class="career-memory__hint">← → NAVIGATE / ENTER TO LOAD</p>
+    <p class="career-memory__hint">← → {{ t('experiences.memoryCards.hint') }}</p>
   </div>
 </template>
 
